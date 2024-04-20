@@ -1,3 +1,8 @@
+package simulation;
+
+import entities.Bee;
+import java.util.List;
+
 public class FoodSource {
     protected int positionX;
     protected int positionY;
@@ -6,6 +11,14 @@ public class FoodSource {
     public FoodSource(int posX, int posY, double quality) {
         this.positionX = posX;
         this.positionY = posY;
+        this.quality = quality;
+    }
+
+    public double getQuality() {
+        return quality;
+    }
+
+    public void setQuality(double quality) {
         this.quality = quality;
     }
 

@@ -1,3 +1,10 @@
+import entities.*;
+import simulation.*;
+import simulation.Environment;
+import java.util.ArrayList;
+import java.util.List;
+import simulation.FoodSource;
+
 public class BeeForagingSimulation {
     public static void main(String[] args) {
         Hive hive = new Hive(0, 0);

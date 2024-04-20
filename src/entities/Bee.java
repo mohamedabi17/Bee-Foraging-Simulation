@@ -1,5 +1,7 @@
 package entities;
 
+// Import the FoodSource class if it's in a different package
+import simulation.FoodSource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +12,43 @@ public class Bee {
     protected String behavior;
     protected FoodSource assignedFoodSource;
 
+    public Bee(int posX, int posY, String type) {
+        this.positionX = posX;
+        this.positionY = posY;
+        this.type = type;
+    }
+
+    public Bee(int posX, int posY) {
+        this.positionX = posX;
+        this.positionY = posY;
+    }
+
+    // Constructor with type parameter
     public Bee(String type) {
+        this.type = type;
+    }
+
+    public int getPositionX() {
+        return positionX;
+    }
+
+    public void setPositionX(int positionX) {
+        this.positionX = positionX;
+    }
+
+    public int getPositionY() {
+        return positionY;
+    }
+
+    public void setPositionY(int positionY) {
+        this.positionY = positionY;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
         this.type = type;
     }
 

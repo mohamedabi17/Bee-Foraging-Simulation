@@ -2,10 +2,12 @@ package entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import simulation.FoodSource;
+import java.util.Random;
 
 public class Observer extends Bee {
     public Observer() {
-        super("Observer");
+        super("Observer"); // Call the superclass constructor with the type "Observer"
     }
 
     public void chooseFoodSource(List<FoodSource> foodSources) {

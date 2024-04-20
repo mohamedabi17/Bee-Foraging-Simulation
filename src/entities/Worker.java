@@ -2,6 +2,7 @@ package entities;
 
 import java.util.ArrayList;
 import java.util.List;
+import simulation.FoodSource;
 
 public class Worker extends Bee {
     public Worker() {

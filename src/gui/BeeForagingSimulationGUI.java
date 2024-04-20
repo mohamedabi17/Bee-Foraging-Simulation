@@ -4,8 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import entities.*;
+import simulation.Environment;
+import simulation.FoodSource;
+
 public class BeeForagingSimulationGUI extends JFrame {
     private Environment environment;
+    private JLabel[][] gridLabels; // Declare gridLabels as a class member
 
     public BeeForagingSimulationGUI(Environment environment) {
         this.environment = environment;
@@ -22,8 +27,10 @@ public class BeeForagingSimulationGUI extends JFrame {
         JPanel mainPanel = new JPanel(new BorderLayout());
         JPanel gridPanel = new JPanel(new GridLayout(environment.getWidth(), environment.getHeight()));
 
+        // Initialize gridLabels
+        gridLabels = new JLabel[environment.getWidth()][environment.getHeight()];
+
         // Create JLabels to represent grid cells
-        JLabel[][] gridLabels = new JLabel[environment.getWidth()][environment.getHeight()];
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
                 gridLabels[i][j] = new JLabel();
@@ -62,7 +69,7 @@ public class BeeForagingSimulationGUI extends JFrame {
 
     public static void main(String[] args) {
         // Create an instance of Environment
-        Environment environment = new Environment(10, 10);
+        Environment environment = new Environment(10, 10, 10);
 
         // Place some food sources
         environment.placeFoodSource(2, 3, 0.8);
