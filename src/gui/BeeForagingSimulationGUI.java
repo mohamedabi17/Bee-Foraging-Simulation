@@ -44,39 +44,53 @@ public class BeeForagingSimulationGUI extends JFrame {
 
     private void loadIcons() {
         // Load images for bees
-        workerIcon = new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"));
-        // Load other icons similarly
-        scoutIcon = new ImageIcon(getClass().getResource("resources/images/Scout Bee.jpg"));
-        observerIcon = new ImageIcon(getClass().getResource("resources/images/Observer Bee.jpg"));
+        workerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"))
+                .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+        scoutIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Scout.jpg"))
+                .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+        observerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Observer Bee.jpg"))
+                .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
         // Load image for food source
-        foodSourceIcon = new ImageIcon(getClass().getResource("resources/images/Bee Food.jpg"));
+        foodSourceIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Flower.jpeg"))
+                .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
         // Load image for hive
-        hiveIcon = new ImageIcon(getClass().getResource("resources/images/Hive.png"));
+        hiveIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Hive.png"))
+                .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+
+        // Set descriptions for icons
+        workerIcon.setDescription("Worker Bee");
+        scoutIcon.setDescription("Scout Bee");
+        observerIcon.setDescription("Observer Bee");
+        foodSourceIcon.setDescription("Food Source");
+        hiveIcon.setDescription("Hive");
     }
 
     private void initGUI() {
         JPanel mainPanel = new JPanel(new BorderLayout());
-        JPanel gridPanel = new JPanel(new GridLayout(environment.getWidth(), environment.getHeight()));
+        mainPanel.setBackground(Color.BLACK);
 
-        // Initialize gridLabels
+        JPanel gridPanel = new JPanel(new GridLayout(environment.getWidth(), environment.getHeight()));
+        gridPanel.setBackground(Color.BLACK);
+
         gridLabels = new JLabel[environment.getWidth()][environment.getHeight()];
 
-        // Create JLabels to represent grid cells
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
                 gridLabels[i][j] = new JLabel();
-                gridLabels[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                gridLabels[i][j].setBorder(BorderFactory.createLineBorder(Color.WHITE)); // Set border color to white
+                gridLabels[i][j].setForeground(Color.WHITE);
                 gridPanel.add(gridLabels[i][j]);
+                // Set tooltip for each JLabel
+                gridLabels[i][j].setToolTipText(workerIcon.getDescription()); // Replace with the appropriate icon
             }
         }
 
         mainPanel.add(gridPanel, BorderLayout.CENTER);
+
         add(mainPanel);
 
-        // Add parameter controls
         addParameterControls();
 
-        // Update GUI with initial state of the simulation
         updateGUI();
     }
 
@@ -90,6 +104,7 @@ public class BeeForagingSimulationGUI extends JFrame {
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
                 gridLabels[i][j].setIcon(null); // Clear icon
+                gridLabels[i][j].setToolTipText(null); // Clear tooltip
             }
         }
 
@@ -99,8 +114,10 @@ public class BeeForagingSimulationGUI extends JFrame {
                 if (grid[i][j] != null) {
                     if (grid[i][j].isHive()) { // Check if it's a hive
                         gridLabels[i][j].setIcon(hiveIcon);
+                        gridLabels[i][j].setToolTipText("Hive");
                     } else {
                         gridLabels[i][j].setIcon(foodSourceIcon);
+                        gridLabels[i][j].setToolTipText("Food Source");
                     }
                 }
             }
@@ -111,19 +128,30 @@ public class BeeForagingSimulationGUI extends JFrame {
             int x = bee.getPositionX();
             int y = bee.getPositionY();
             ImageIcon beeIcon = null;
+            String beeType = "";
 
             if (bee instanceof Worker) {
                 beeIcon = workerIcon;
+                beeType = "Worker Bee";
             } else if (bee instanceof Scout) {
                 beeIcon = scoutIcon;
+                beeType = "Scout Bee";
             } else if (bee instanceof Observer) {
                 beeIcon = observerIcon;
+                beeType = "Observer Bee";
             }
 
             if (beeIcon != null && x >= 0 && x < environment.getWidth() && y >= 0 && y < environment.getHeight()) {
                 gridLabels[x][y].setIcon(beeIcon);
+                gridLabels[x][y].setToolTipText(beeType); // Set tooltip for bee
             }
         }
+
+        // Display the hive at the center of the grid
+        int hiveX = environment.getWidth() / 2;
+        int hiveY = environment.getHeight() / 2;
+        gridLabels[hiveX][hiveY].setIcon(hiveIcon);
+        gridLabels[hiveX][hiveY].setToolTipText("Hive");
     }
 
     private void addParameterControls() {
@@ -190,6 +218,7 @@ public class BeeForagingSimulationGUI extends JFrame {
         environment.placeFoodSource(2, 3, 0.8);
         environment.placeFoodSource(7, 8, 0.6);
 
+        environment.addHive();
         // Add some bees to the environment
         environment.addBee(new Worker());
         environment.addBee(new Scout());

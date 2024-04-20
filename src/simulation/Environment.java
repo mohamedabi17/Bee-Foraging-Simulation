@@ -7,6 +7,7 @@ import java.util.Random;
 
 import entities.Worker;
 import entities.Observer;
+import entities.Hive;
 import entities.Scout;
 
 public class Environment {
@@ -15,6 +16,7 @@ public class Environment {
     private int width;
     private int height;
     private Random random;
+    private Hive hive;
 
     private int attemptCounter = 0;
     private static final int MAX_ATTEMPTS = 10; // Set this to your desired threshold
@@ -29,6 +31,10 @@ public class Environment {
         // Place food sources in the environment
         placeFoodSource(2, 3, 0.8);
         placeFoodSource(7, 8, 0.6);
+
+        // Add hive to the environment
+        // hive = new Hive(width / 2, height / 2); // Place hive at the center of the
+        // environment
 
         // Add bees to the environment
         for (int i = 0; i < numBees; i++) {
@@ -53,6 +59,10 @@ public class Environment {
 
     public void addBee(Bee bee) {
         bees.add(bee);
+    }
+
+    public void addHive() {
+        hive = new Hive(width / 2, height / 2); // Place hive at the center of the environment
     }
 
     public void simulate() {
