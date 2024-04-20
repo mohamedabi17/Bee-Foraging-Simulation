@@ -18,6 +18,16 @@ public class Bee {
         this.type = type;
     }
 
+    protected FoodSource currentFoodSource;
+
+    public FoodSource getCurrentFoodSource() {
+        return this.currentFoodSource;
+    }
+
+    public void setCurrentFoodSource(FoodSource foodSource) {
+        this.currentFoodSource = foodSource;
+    }
+
     public Bee(int posX, int posY) {
         this.positionX = posX;
         this.positionY = posY;

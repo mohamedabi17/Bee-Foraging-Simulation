@@ -29,6 +29,10 @@ public class Hive {
         return foodSources;
     }
 
+    public void setFoodSources(List<FoodSource> foodSources) {
+        this.foodSources = foodSources;
+    }
+
     public List<Bee> getBees() {
         return bees;
     }

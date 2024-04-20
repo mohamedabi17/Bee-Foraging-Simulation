@@ -7,17 +7,21 @@ import simulation.FoodSource;
 
 public class BeeForagingSimulation {
     public static void main(String[] args) {
+        // Create food sources
+        List<FoodSource> foodSources = new ArrayList<>();
+        foodSources.add(new FoodSource(3, 4, 0.8));
+        foodSources.add(new FoodSource(7, 8, 0.6));
+
+        // Create hive and add bees
         Hive hive = new Hive(0, 0);
         hive.addBee(new Worker());
         hive.addBee(new Scout());
         hive.addBee(new Observer());
 
-        Environment environment = new Environment(10, 10, 5);
-        environment.placeFoodSource(3, 4, 0.8);
-        environment.placeFoodSource(7, 8, 0.6);
+        // Set food sources for the hive
+        hive.setFoodSources(foodSources);
 
         // Simulate bee behaviors
-        List<FoodSource> foodSources = hive.getFoodSources();
         for (Bee bee : hive.getBees()) {
             bee.exploreFoodSource();
             if (bee instanceof Worker) {

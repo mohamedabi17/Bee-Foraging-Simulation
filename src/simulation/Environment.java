@@ -5,12 +5,19 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
+import entities.Worker;
+import entities.Observer;
+import entities.Scout;
+
 public class Environment {
     private FoodSource[][] grid;
     private List<Bee> bees;
     private int width;
     private int height;
     private Random random;
+
+    private int attemptCounter = 0;
+    private static final int MAX_ATTEMPTS = 10; // Set this to your desired threshold
 
     public Environment(int width, int height, int numBees) {
         this.width = width;
@@ -19,9 +26,14 @@ public class Environment {
         this.bees = new ArrayList<>();
         this.random = new Random();
 
+        // Place food sources in the environment
+        placeFoodSource(2, 3, 0.8);
+        placeFoodSource(7, 8, 0.6);
+
         // Add bees to the environment
         for (int i = 0; i < numBees; i++) {
-            addBee(new Bee(random.nextInt(width), random.nextInt(height)));
+            FoodSource foodSource = getFoodSources().get(random.nextInt(getFoodSources().size()));
+            addBee(foodSource);
         }
     }
 
@@ -31,6 +43,12 @@ public class Environment {
         } else {
             System.out.println("Invalid position for food source");
         }
+    }
+
+    public void addBee(FoodSource foodSource) {
+        Worker worker = new Worker();
+        worker.setCurrentFoodSource(foodSource);
+        bees.add(worker);
     }
 
     public void addBee(Bee bee) {
@@ -53,6 +71,16 @@ public class Environment {
                     double newQuality = calculateNewQuality(grid[i][j]);
                     grid[i][j].setQuality(newQuality);
                 }
+            }
+        }
+
+        for (Bee bee : bees) {
+            if (bee instanceof Worker) {
+                ((Worker) bee).exploreAndChooseFoodSource(this);
+            } else if (bee instanceof Scout) {
+                ((Scout) bee).chooseRandomFoodSource(this);
+            } else if (bee instanceof Observer) {
+                ((Observer) bee).observeAndChooseFoodSource(this);
             }
         }
     }
@@ -81,4 +109,53 @@ public class Environment {
     public List<Bee> getBees() {
         return bees;
     }
+
+    public List<FoodSource> getNeighboringFoodSources(Bee bee) {
+        // This method should return a list of FoodSource objects that are in the
+        // neighborhood of the given bee.
+        // The definition of "neighborhood" depends on your specific project
+        // requirements.
+        // Here is a simple implementation that considers all food sources in the grid
+        // as neighbors.
+
+        List<FoodSource> neighboringSources = new ArrayList<>();
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (grid[i][j] != null) {
+                    neighboringSources.add(grid[i][j]);
+                }
+            }
+        }
+        return neighboringSources;
+    }
+
+    public List<FoodSource> getFoodSources() {
+        // This method should return a list of all food sources in the environment.
+        // Here is a simple implementation that returns all food sources in the grid.
+
+        List<FoodSource> foodSources = new ArrayList<>();
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (grid[i][j] != null) {
+                    foodSources.add(grid[i][j]);
+                }
+            }
+        }
+        return foodSources;
+    }
+
+    public List<Worker> getWorkers() {
+        // This method should return a list of all worker bees in the environment.
+        // Here is a simple implementation that filters all bees in the bees list and
+        // returns only the workers.
+
+        List<Worker> workers = new ArrayList<>();
+        for (Bee bee : bees) {
+            if (bee instanceof Worker) {
+                workers.add((Worker) bee);
+            }
+        }
+        return workers;
+    }
+
 }
