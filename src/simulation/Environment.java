@@ -17,9 +17,13 @@ public class Environment {
     private int height;
     private Random random;
     private Hive hive;
+    private int foodSourceCount;
+    private double lowQualityThreshold;
+    private double mediumQualityThreshold;
+    private double highQualityThreshold;
 
     private int attemptCounter = 0;
-    private static final int MAX_ATTEMPTS = 10; // Set this to your desired threshold
+    private static int MAX_ATTEMPTS = 10; // Define MAX_ATTEMPTS as a static variable
 
     public Environment(int width, int height, int numBees) {
         this.width = width;
@@ -31,6 +35,7 @@ public class Environment {
         // Place food sources in the environment
         placeFoodSource(2, 3, 0.8);
         placeFoodSource(7, 8, 0.6);
+        placeFoodSource(2, 3, 0.8);
 
         // Add hive to the environment
         // hive = new Hive(width / 2, height / 2); // Place hive at the center of the
@@ -120,6 +125,10 @@ public class Environment {
         return bees;
     }
 
+    public void setMaximumTrialCount(int maxAttempts) {
+        MAX_ATTEMPTS = maxAttempts; // Update MAX_ATTEMPTS with the new value
+    }
+
     public List<FoodSource> getNeighboringFoodSources(Bee bee) {
         // This method should return a list of FoodSource objects that are in the
         // neighborhood of the given bee.
@@ -166,6 +175,152 @@ public class Environment {
             }
         }
         return workers;
+    }
+
+    public int getWorkerCount() {
+        int count = 0;
+        for (Bee bee : bees) {
+            if (bee instanceof Worker) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getScoutCount() {
+        int count = 0;
+        for (Bee bee : bees) {
+            if (bee instanceof Scout) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public int getObserverCount() {
+        int count = 0;
+        for (Bee bee : bees) {
+            if (bee instanceof Observer) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void removeWorker() {
+        // Find and remove a worker bee from the list of bees
+        for (int i = 0; i < bees.size(); i++) {
+            Bee bee = bees.get(i);
+            if (bee instanceof Worker) {
+                bees.remove(i);
+                return; // Exit the loop after removing the worker bee
+            }
+        }
+    }
+
+    public void removeScout() {
+        // Find and remove a scout bee from the list of bees
+        for (int i = 0; i < bees.size(); i++) {
+            Bee bee = bees.get(i);
+            if (bee instanceof Scout) {
+                bees.remove(i);
+                return; // Exit the loop after removing the scout bee
+            }
+        }
+    }
+
+    public void removeObserver() {
+        // Find and remove an observer bee from the list of bees
+        for (int i = 0; i < bees.size(); i++) {
+            Bee bee = bees.get(i);
+            if (bee instanceof Observer) {
+                bees.remove(i);
+                return; // Exit the loop after removing the observer bee
+            }
+        }
+    }
+
+    public void setWorkerCount(int count) {
+        // Clear existing workers if the count is less than the current count
+        if (count < getWorkerCount()) {
+            int difference = getWorkerCount() - count;
+            for (int i = 0; i < difference; i++) {
+                removeWorker();
+            }
+        }
+        // Add new workers if the count is greater than the current count
+        else if (count > getWorkerCount()) {
+            int difference = count - getWorkerCount();
+            for (int i = 0; i < difference; i++) {
+                addBee(new Worker());
+            }
+        }
+    }
+
+    public void setScoutCount(int count) {
+        // Clear existing scouts if the count is less than the current count
+        if (count < getScoutCount()) {
+            int difference = getScoutCount() - count;
+            for (int i = 0; i < difference; i++) {
+                removeScout();
+            }
+        }
+        // Add new scouts if the count is greater than the current count
+        else if (count > getScoutCount()) {
+            int difference = count - getScoutCount();
+            for (int i = 0; i < difference; i++) {
+                addBee(new Scout());
+            }
+        }
+    }
+
+    public void setObserverCount(int count) {
+        // Clear existing observers if the count is less than the current count
+        if (count < getObserverCount()) {
+            int difference = getObserverCount() - count;
+            for (int i = 0; i < difference; i++) {
+                removeObserver();
+            }
+        }
+        // Add new observers if the count is greater than the current count
+        else if (count > getObserverCount()) {
+            int difference = count - getObserverCount();
+            for (int i = 0; i < difference; i++) {
+                addBee(new Observer());
+            }
+        }
+    }
+
+    public void setFoodSourceCount(int foodSourceCount) {
+        this.foodSourceCount = foodSourceCount;
+    }
+
+    public void setLowQualityThreshold(double lowQualityThreshold) {
+        this.lowQualityThreshold = lowQualityThreshold;
+    }
+
+    public void setMediumQualityThreshold(double mediumQualityThreshold) {
+        this.mediumQualityThreshold = mediumQualityThreshold;
+    }
+
+    public void setHighQualityThreshold(double highQualityThreshold) {
+        this.highQualityThreshold = highQualityThreshold;
+    }
+
+    public int getFoodSourceCount() {
+        return foodSourceCount;
+    }
+
+    public double getLowQualityThreshold() {
+        return lowQualityThreshold;
+    }
+
+    public double getMediumQualityThreshold() {
+        return mediumQualityThreshold;
+    }
+
+    public double getHighQualityThreshold() {
+        return highQualityThreshold;
     }
 
 }
