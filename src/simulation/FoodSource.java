@@ -1,12 +1,9 @@
 package simulation;
 
-import entities.Bee;
-import java.util.List;
-
 public class FoodSource {
-    protected int positionX;
-    protected int positionY;
-    protected double quality;
+    private int positionX;
+    private int positionY;
+    private double quality;
     private boolean isHive; // Flag to indicate if it's a hive or not
 
     private int attemptCounter = 0;
@@ -32,9 +29,20 @@ public class FoodSource {
         this.quality = quality;
     }
 
-    public double evaluateQuality() {
-        // Evaluate the quality of the food source based on criteria
-        return quality;
+    public int getPositionX() {
+        return positionX;
+    }
+
+    public void setPositionX(int positionX) {
+        this.positionX = positionX;
+    }
+
+    public int getPositionY() {
+        return positionY;
+    }
+
+    public void setPositionY(int positionY) {
+        this.positionY = positionY;
     }
 
     public boolean isHive() {
@@ -48,8 +56,16 @@ public class FoodSource {
     public void incrementAttemptCounter() {
         this.attemptCounter++;
         if (this.attemptCounter >= MAX_ATTEMPTS) {
-            // remove this food source from environment
+            // Remove this food source from the environment
             // You'll need to add a method in your Environment class to do this
         }
+    }
+
+    public int getAttemptCount() {
+        return this.attemptCounter;
+    }
+
+    public double evaluateQuality() {
+        return this.quality;
     }
 }

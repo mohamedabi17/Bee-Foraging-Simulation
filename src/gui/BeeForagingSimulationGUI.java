@@ -22,120 +22,65 @@ public class BeeForagingSimulationGUI extends JFrame {
     private ImageIcon scoutIcon;
     private ImageIcon observerIcon;
     private ImageIcon foodSourceIcon;
+    private ImageIcon flowerIconLowQuality;
+    private ImageIcon flowerIconMediumQuality;
+    private ImageIcon flowerIconHighQuality;
+
     private ImageIcon hiveIcon;
-    private int foodSourceCount;
-    private double lowQualityThreshold;
-    private double mediumQualityThreshold;
-    private double highQualityThreshold;
+
+    private JButton simulateButton;
+    private JTextField workerCountField;
+    private JTextField scoutCountField;
+    private JTextField observerCountField;
 
     private Random random; // Declare Random for random number generation
 
     public BeeForagingSimulationGUI(Environment environment) {
         this.environment = environment;
         setTitle("Bee Foraging Simulation");
-        setSize(800, 600);
+        setSize(1200, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-            // Declare instance variables
-    private JTextField workerCountField;
-    private JTextField scoutCountField;
-    private JTextField observerCountField;
-    private JTextField foodSourceCountField;
-    private JTextField lowQualityThresholdField;
-    private JTextField mediumQualityThresholdField;
-    private JTextField highQualityThresholdField;
+        random = new Random(); // Initialize Random
 
-    // Inside the constructor or initialization method
-    workerCountField=new JTextField();scoutCountField=new JTextField();observerCountField=new JTextField();foodSourceCountField=new JTextField();lowQualityThresholdField=new JTextField();mediumQualityThresholdField=new JTextField();highQualityThresholdField=new JTextField();
+        // Load images/icons
+        loadIcons();
 
-    random=new Random(); // Initialize Random
+        // Create and add components to the GUI
+        initGUI();
 
-    // Load images/icons
-    loadIcons();
-
-    // Create and add components to the GUI
-    initGUI();
+    }
 
     private void loadIcons() {
-            // Load images for bees
-            workerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"))
-                    .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            scoutIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Scout.jpg"))
-                    .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            observerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Observer Bee.jpg"))
-                    .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            // Load images for food sources based on quality
-            ImageIcon flowerIconLowQuality = new ImageIcon(
-                    new ImageIcon(getClass().getResource("resources/images/Flower_low_quality.jpeg"))
-                            .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon flowerIconMediumQuality = new ImageIcon(
-                    new ImageIcon(getClass().getResource("resources/images/Flower_medium_quality.jpeg"))
-                            .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            ImageIcon flowerIconHighQuality = new ImageIcon(
-                    new ImageIcon(getClass().getResource("resources/images/Flower_high_quality.jpeg"))
-                            .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
-            // Load image for hive
-            hiveIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Hive.png"))
-                    .getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+        // Load images for bees
+        workerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"))
+                .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        scoutIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Scout.jpg"))
+                .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        observerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Observer Bee.jpg"))
+                .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        // Load images for food sources based on quality
+        flowerIconLowQuality = new ImageIcon(
+                new ImageIcon(getClass().getResource("resources/images/Flower_low_quality.jpg"))
+                        .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        flowerIconMediumQuality = new ImageIcon(
+                new ImageIcon(getClass().getResource("resources/images/Flower_medium_quality.jpg"))
+                        .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        flowerIconHighQuality = new ImageIcon(
+                new ImageIcon(getClass().getResource("resources/images/Flower_high_quality.jpg"))
+                        .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
+        // Load image for hive
+        hiveIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Hive.jpg"))
+                .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
 
-            // Set descriptions for icons
-            workerIcon.setDescription("Worker Bee");
-            scoutIcon.setDescription("Scout Bee");
-            observerIcon.setDescription("Observer Bee");
-            hiveIcon.setDescription("Hive");
+        // Set descriptions for icons
+        workerIcon.setDescription("Worker Bee");
+        scoutIcon.setDescription("Scout Bee");
+        observerIcon.setDescription("Observer Bee");
+        hiveIcon.setDescription("Hive");
 
-            // Assign icons based on food source quality thresholds
-            double lowQualityThreshold = environment.getLowQualityThreshold();
-            double mediumQualityThreshold = environment.getMediumQualityThreshold();
-            double highQualityThreshold = environment.getHighQualityThreshold();
-
-            // Low-quality food source
-            if (lowQualityThreshold < mediumQualityThreshold) {
-                foodSourceIcon = flowerIconLowQuality;
-                foodSourceIcon.setDescription("Food Source (Low Quality)");
-            }
-            // Medium-quality food source
-            else if (mediumQualityThreshold < highQualityThreshold) {
-                foodSourceIcon = flowerIconMediumQuality;
-                foodSourceIcon.setDescription("Food Source (Medium Quality)");
-            }
-            // High-quality food source
-            else {
-                foodSourceIcon = flowerIconHighQuality;
-                foodSourceIcon.setDescription("Food Source (High Quality)");
-            }
-        }
-
-    // Inside the simulateButton ActionListener
-    // Inside the simulateButton ActionListener
-    simulateButton.addActionListener(e->
-
-    {
-        // Parse user input and set simulation parameters
-        int workerCount = Integer.parseInt(workerCountField.getText());
-        int scoutCount = Integer.parseInt(scoutCountField.getText());
-        int observerCount = Integer.parseInt(observerCountField.getText());
-        int foodSourceCount = Integer.parseInt(foodSourceCountField.getText());
-        double lowQualityThreshold = Double.parseDouble(lowQualityThresholdField.getText());
-        double mediumQualityThreshold = Double.parseDouble(mediumQualityThresholdField.getText());
-        double highQualityThreshold = Double.parseDouble(highQualityThresholdField.getText());
-
-        // Set simulation parameters
-        environment.setWorkerCount(workerCount);
-        environment.setScoutCount(scoutCount);
-        environment.setObserverCount(observerCount);
-        environment.setFoodSourceCount(foodSourceCount);
-        environment.setLowQualityThreshold(lowQualityThreshold);
-        environment.setMediumQualityThreshold(mediumQualityThreshold);
-        environment.setHighQualityThreshold(highQualityThreshold);
-
-        // Trigger the simulation
-        environment.simulate();
-
-        // Update the GUI to reflect the new state of the simulation
-        updateGUI();
-    });
+    }
 
     private void initGUI() {
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -151,6 +96,8 @@ public class BeeForagingSimulationGUI extends JFrame {
                 gridLabels[i][j] = new JLabel();
                 gridLabels[i][j].setBorder(BorderFactory.createLineBorder(Color.WHITE)); // Set border color to white
                 gridLabels[i][j].setForeground(Color.WHITE);
+                // Adjust the preferred size of the label to increase height
+                gridLabels[i][j].setPreferredSize(new Dimension(100, 135)); // Increase height to 135 pixels
                 gridPanel.add(gridLabels[i][j]);
                 // Set tooltip for each JLabel
                 gridLabels[i][j].setToolTipText(workerIcon.getDescription()); // Replace with the appropriate icon
@@ -188,8 +135,18 @@ public class BeeForagingSimulationGUI extends JFrame {
                         gridLabels[i][j].setIcon(hiveIcon);
                         gridLabels[i][j].setToolTipText("Hive");
                     } else {
-                        gridLabels[i][j].setIcon(foodSourceIcon);
-                        gridLabels[i][j].setToolTipText("Food Source");
+                        // Set food source icon based on quality
+                        double quality = grid[i][j].getQuality();
+                        if (quality < environment.getLowQualityThreshold()) {
+                            gridLabels[i][j].setIcon(flowerIconLowQuality);
+                            gridLabels[i][j].setToolTipText("Food Source (Low Quality)");
+                        } else if (quality < environment.getMediumQualityThreshold()) {
+                            gridLabels[i][j].setIcon(flowerIconMediumQuality);
+                            gridLabels[i][j].setToolTipText("Food Source (Medium Quality)");
+                        } else {
+                            gridLabels[i][j].setIcon(flowerIconHighQuality);
+                            gridLabels[i][j].setToolTipText("Food Source (High Quality)");
+                        }
                     }
                 }
             }
@@ -224,122 +181,147 @@ public class BeeForagingSimulationGUI extends JFrame {
         int hiveY = environment.getHeight() / 2;
         gridLabels[hiveX][hiveY].setIcon(hiveIcon);
         gridLabels[hiveX][hiveY].setToolTipText("Hive");
+
     }
 
     private void addParameterControls() {
-    JPanel controlPanel = new JPanel(new GridLayout(6, 2)); // Update the layout to accommodate the new parameters
+        JPanel controlPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
-    // Add controls for configuring simulation parameters
-    JLabel label1 = new JLabel("Number of Workers:");
-    workerCountField = new JTextField();
-    controlPanel.add(label1);
-    controlPanel.add(workerCountField);
+        // Add controls for configuring simulation parameters
+        JLabel label1 = new JLabel("Number of Workers:");
+        controlPanel.add(label1, gbc);
+        gbc.gridx++;
+        workerCountField = new JTextField(10);
+        controlPanel.add(workerCountField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
 
-    JLabel label2 = new JLabel("Number of Scouts:");
-    scoutCountField = new JTextField();
-    controlPanel.add(label2);
-    controlPanel.add(scoutCountField);
+        JLabel label2 = new JLabel("Number of Scouts:");
+        controlPanel.add(label2, gbc);
+        gbc.gridx++;
+        scoutCountField = new JTextField(10);
+        controlPanel.add(scoutCountField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
 
-    JLabel label3 = new JLabel("Number of Observers:");
-    observerCountField = new JTextField();
-    controlPanel.add(label3);
-    controlPanel.add(observerCountField);
+        JLabel label3 = new JLabel("Number of Observers:");
+        controlPanel.add(label3, gbc);
+        gbc.gridx++;
+        observerCountField = new JTextField(10);
+        controlPanel.add(observerCountField, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
 
-    JLabel label4 = new JLabel("Number of Food Sources:");
-    foodSourceCountField = new JTextField();
-    controlPanel.add(label4);
-    controlPanel.add(foodSourceCountField);
+        // Add note about food quality
+        JLabel qualityNoteLabel = new JLabel("Note: The more red the food is, the higher the quality.");
+        qualityNoteLabel.setForeground(Color.RED); // Set the text color to red
+        controlPanel.add(qualityNoteLabel, gbc);
+        gbc.gridx = 0;
+        gbc.gridwidth = 2; // Span across two columns
+        gbc.gridy++;
 
-    JLabel label5 = new JLabel("Low Quality Threshold:");
-    lowQualityThresholdField = new JTextField();
-    controlPanel.add(label5);
-    controlPanel.add(lowQualityThresholdField);
+        JLabel label8 = new JLabel("Maximum Trial Count:");
+        controlPanel.add(label8, gbc);
+        gbc.gridx++;
+        JSlider trialCountSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 100);
+        trialCountSlider.setMajorTickSpacing(10);
+        trialCountSlider.setMinorTickSpacing(1);
+        trialCountSlider.setPaintTicks(true);
+        trialCountSlider.setPaintLabels(true);
+        controlPanel.add(trialCountSlider, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
 
-    JLabel label6 = new JLabel("Medium Quality Threshold:");
-    mediumQualityThresholdField = new JTextField();
-    controlPanel.add(label6);
-    controlPanel.add(mediumQualityThresholdField);
-
-    JLabel label7 = new JLabel("High Quality Threshold:");
-    highQualityThresholdField = new JTextField();
-    controlPanel.add(label7);
-    controlPanel.add(highQualityThresholdField);
-
-    JLabel label8 = new JLabel("Maximum Trial Count:");
-    JSlider trialCountSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 50);
-    trialCountSlider.setMajorTickSpacing(10);
-    trialCountSlider.setMinorTickSpacing(1);
-    trialCountSlider.setPaintTicks(true);
-    trialCountSlider.setPaintLabels(true);
-    controlPanel.add(label8);
-    controlPanel.add(trialCountSlider);
-
-    // Add listener for slider value change
-    trialCountSlider.addChangeListener(new ChangeListener() {
-        public void stateChanged(ChangeEvent event) {
-            JSlider source = (JSlider) event.getSource();
-            if (!source.getValueIsAdjusting()) {
-                int value = source.getValue();
-                environment.setMaximumTrialCount(value); // Update maximum trial count in the environment
+        // Add listener for slider value change
+        trialCountSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent event) {
+                JSlider source = (JSlider) event.getSource();
+                if (!source.getValueIsAdjusting()) {
+                    int value = source.getValue();
+                    environment.setMaximumTrialCount(value); // Update maximum trial count in the environment
+                }
             }
-        }
-    });
+        });
 
-    // Add a button to trigger the simulation
-    JButton simulateButton = new JButton("Simulate");
-    controlPanel.add(simulateButton);
+        // Add a button to trigger the simulation
+        simulateButton = new JButton("Simulate"); // Assign the value to the class member simulateButton
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        controlPanel.add(simulateButton, gbc);
 
-    // Add an ActionListener to the button
-    simulateButton.addActionListener(e -> {
-        // Parse user input and set simulation parameters
-        int workerCount = Integer.parseInt(workerCountField.getText());
-        int scoutCount = Integer.parseInt(scoutCountField.getText());
-        int observerCount = Integer.parseInt(observerCountField.getText());
-        int foodSourceCount = Integer.parseInt(foodSourceCountField.getText());
-        double lowQualityThreshold = Double.parseDouble(lowQualityThresholdField.getText());
-        double mediumQualityThreshold = Double.parseDouble(mediumQualityThresholdField.getText());
-        double highQualityThreshold = Double.parseDouble(highQualityThresholdField.getText());
-
-        // Set simulation parameters
-        environment.setWorkerCount(workerCount);
-        environment.setScoutCount(scoutCount);
-        environment.setObserverCount(observerCount);
-        environment.setFoodSourceCount(foodSourceCount);
-        environment.setLowQualityThreshold(lowQualityThreshold);
-        environment.setMediumQualityThreshold(mediumQualityThreshold);
-        environment.setHighQualityThreshold(highQualityThreshold);
-
-        // Trigger the simulation
-        environment.simulate();
-
-        // Update the GUI to reflect the new state of the simulation
-        updateGUI();
-    });
-
-    // Add control panel to main panel
-    add(controlPanel, BorderLayout.SOUTH);
-}
+        // Add control panel to main panel
+        add(controlPanel, BorderLayout.SOUTH);
     }
+
+    public JButton getSimulateButton() {
+        return simulateButton;
+    }
+
+    // Getter method for workerCountField
+    public JTextField getWorkerCountField() {
+        return workerCountField;
+    }
+
+    // Getter method for scoutCountField
+    public JTextField getScoutCountField() {
+        return scoutCountField;
+    }
+
+    // Getter method for observerCountField
+    public JTextField getObserverCountField() {
+        return observerCountField;
+    }
+
     public static void main(String[] args) {
         // Create an instance of Environment
-        Environment environment = new Environment(10, 10, 10);
+        Environment environment = new Environment(10, 10);
 
-        // Place some food sources
-        // Place three food sources with different qualities
-        environment.placeFoodSource(2, 3, 0.3); // Low quality
-        environment.placeFoodSource(5, 5, 0.6); // Medium quality
-        environment.placeFoodSource(7, 8, 0.9); // High quality
+        // Create an instance of BeeForagingSimulationGUI to access its components
+        BeeForagingSimulationGUI gui = new BeeForagingSimulationGUI(environment);
 
-        environment.addHive();
-        // Add some bees to the environment
-        environment.addBee(new Worker());
-        environment.addBee(new Scout());
-        environment.addBee(new Observer());
+        // Add action listener to the simulateButton to trigger simulation
+        gui.getSimulateButton().addActionListener(e -> {
+            // Validate and parse input for numeric fields
+            try {
+                int workerCount = Integer.parseInt(gui.getWorkerCountField().getText());
+                int scoutCount = Integer.parseInt(gui.getScoutCountField().getText());
+                int observerCount = Integer.parseInt(gui.getObserverCountField().getText());
 
-        // Create and display the GUI
+                for (int i = 0; i < workerCount; i++) {
+                    environment.addBee(new Worker());
+                }
+
+                for (int i = 0; i < scoutCount; i++) {
+                    environment.addBee(new Scout());
+                }
+
+                for (int i = 0; i < observerCount; i++) {
+                    environment.addBee(new Observer());
+                }
+
+                environment.addHive();
+
+                // Trigger the simulation
+                environment.simulate();
+
+                // Update the GUI to reflect the new state of the simulation
+                gui.updateGUI();
+            } catch (NumberFormatException ex) {
+                // Handle parsing errors
+                JOptionPane.showMessageDialog(gui, "Please enter valid numeric values for all fields.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        // Display the GUI
         SwingUtilities.invokeLater(() -> {
-            BeeForagingSimulationGUI gui = new BeeForagingSimulationGUI(environment);
             gui.setVisible(true);
         });
     }
+
 }

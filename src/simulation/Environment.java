@@ -1,14 +1,14 @@
 package simulation;
 
 import entities.Bee;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Random;
-
-import entities.Worker;
 import entities.Observer;
 import entities.Hive;
 import entities.Scout;
+import entities.Worker;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Environment {
     private FoodSource[][] grid;
@@ -17,35 +17,26 @@ public class Environment {
     private int height;
     private Random random;
     private Hive hive;
-    private int foodSourceCount;
     private double lowQualityThreshold;
     private double mediumQualityThreshold;
     private double highQualityThreshold;
+    private static final double BEST_SOURCE_QUALITY_THRESHOLD = 0.9;
+    private static int MAX_ATTEMPTS = 10;
 
-    private int attemptCounter = 0;
-    private static int MAX_ATTEMPTS = 10; // Define MAX_ATTEMPTS as a static variable
-
-    public Environment(int width, int height, int numBees) {
+    public Environment(int width, int height) {
         this.width = width;
         this.height = height;
         this.grid = new FoodSource[width][height];
         this.bees = new ArrayList<>();
         this.random = new Random();
 
-        // Place food sources in the environment
-        placeFoodSource(2, 3, 0.8);
-        placeFoodSource(7, 8, 0.6);
-        placeFoodSource(2, 3, 0.8);
+        lowQualityThreshold = 0.4;
+        mediumQualityThreshold = 0.6;
+        highQualityThreshold = 0.8;
 
-        // Add hive to the environment
-        // hive = new Hive(width / 2, height / 2); // Place hive at the center of the
-        // environment
-
-        // Add bees to the environment
-        for (int i = 0; i < numBees; i++) {
-            FoodSource foodSource = getFoodSources().get(random.nextInt(getFoodSources().size()));
-            addBee(foodSource);
-        }
+        // Initialize the environment with food sources and add hive
+        initializeFoodSources();
+        addHive();
     }
 
     public void placeFoodSource(int posX, int posY, double quality) {
@@ -54,12 +45,6 @@ public class Environment {
         } else {
             System.out.println("Invalid position for food source");
         }
-    }
-
-    public void addBee(FoodSource foodSource) {
-        Worker worker = new Worker();
-        worker.setCurrentFoodSource(foodSource);
-        bees.add(worker);
     }
 
     public void addBee(Bee bee) {
@@ -71,6 +56,8 @@ public class Environment {
     }
 
     public void simulate() {
+        boolean bestSourceFound = false;
+
         // Move bees randomly
         for (Bee bee : bees) {
             int newX = random.nextInt(width);
@@ -89,6 +76,7 @@ public class Environment {
             }
         }
 
+        // Perform actions based on bee types
         for (Bee bee : bees) {
             if (bee instanceof Worker) {
                 ((Worker) bee).exploreAndChooseFoodSource(this);
@@ -97,7 +85,26 @@ public class Environment {
             } else if (bee instanceof Observer) {
                 ((Observer) bee).observeAndChooseFoodSource(this);
             }
+
+            // Check if the best source is found
+            if (bee.getCurrentFoodSource().getQuality() >= BEST_SOURCE_QUALITY_THRESHOLD) {
+                bestSourceFound = true;
+                break;
+            }
         }
+
+        // Terminate simulation if the best source is found or other termination
+        // conditions are met
+        if (bestSourceFound || otherTerminationConditionsMet()) {
+            // Perform necessary termination actions
+            System.out.println("Simulation terminated.");
+            // Additional termination actions can be added here
+        }
+    }
+
+    private boolean otherTerminationConditionsMet() {
+        // Additional termination conditions logic can be implemented here
+        return false;
     }
 
     private double calculateNewQuality(FoodSource foodSource) {
@@ -107,6 +114,39 @@ public class Environment {
 
     private boolean isValidPosition(int posX, int posY) {
         return posX >= 0 && posX < width && posY >= 0 && posY < height;
+    }
+
+    private void initializeFoodSources() {
+        // Place default food sources in the environment
+        placeDefaultFoodSources();
+    }
+
+    private void placeDefaultFoodSources() {
+        // Ensure that exactly three food sources are placed
+        int placedCount = 0;
+
+        // Attempt to place food sources until exactly three are successfully placed
+        while (placedCount < 3) {
+            int x = random.nextInt(width);
+            int y = random.nextInt(height);
+
+            // Check if the position is valid and not already occupied by a food source
+            if (isValidPosition(x, y) && grid[x][y] == null) {
+                // Place the food source with the specified qualities
+                if (placedCount == 0) {
+                    placeFoodSource(x, y, 0.4);
+                } else if (placedCount == 1) {
+                    placeFoodSource(x, y, 0.6);
+                } else if (placedCount == 2) {
+                    placeFoodSource(x, y, 0.8);
+                }
+                placedCount++; // Increment the count of successfully placed food sources
+            }
+        }
+    }
+
+    public void setMaximumTrialCount(int maxAttempts) {
+        MAX_ATTEMPTS = maxAttempts; // Update MAX_ATTEMPTS with the new value
     }
 
     public FoodSource[][] getGrid() {
@@ -125,16 +165,13 @@ public class Environment {
         return bees;
     }
 
-    public void setMaximumTrialCount(int maxAttempts) {
-        MAX_ATTEMPTS = maxAttempts; // Update MAX_ATTEMPTS with the new value
-    }
-
     public List<FoodSource> getNeighboringFoodSources(Bee bee) {
         // This method should return a list of FoodSource objects that are in the
         // neighborhood of the given bee.
         // The definition of "neighborhood" depends on your specific project
         // requirements.
-        // Here is a simple implementation that considers all food sources in the grid
+        // Here is a simple implementation that considers all food sources in the
+        // grid
         // as neighbors.
 
         List<FoodSource> neighboringSources = new ArrayList<>();
@@ -291,26 +328,6 @@ public class Environment {
         }
     }
 
-    public void setFoodSourceCount(int foodSourceCount) {
-        this.foodSourceCount = foodSourceCount;
-    }
-
-    public void setLowQualityThreshold(double lowQualityThreshold) {
-        this.lowQualityThreshold = lowQualityThreshold;
-    }
-
-    public void setMediumQualityThreshold(double mediumQualityThreshold) {
-        this.mediumQualityThreshold = mediumQualityThreshold;
-    }
-
-    public void setHighQualityThreshold(double highQualityThreshold) {
-        this.highQualityThreshold = highQualityThreshold;
-    }
-
-    public int getFoodSourceCount() {
-        return foodSourceCount;
-    }
-
     public double getLowQualityThreshold() {
         return lowQualityThreshold;
     }
@@ -319,8 +336,25 @@ public class Environment {
         return mediumQualityThreshold;
     }
 
-    public double getHighQualityThreshold() {
-        return highQualityThreshold;
+    public void reactivateScout() {
+        List<FoodSource> sourcesToRemove = new ArrayList<>();
+
+        // Check each food source for maximum attempt count
+        for (FoodSource source : getFoodSources()) {
+            if (source.getAttemptCount() >= MAX_ATTEMPTS) {
+                // Remove the source from the environment
+                sourcesToRemove.add(source);
+            }
+        }
+
+        // Remove the sources and reactivate scouts
+        for (FoodSource source : sourcesToRemove) {
+            grid[source.getPositionX()][source.getPositionY()] = null; // Remove the
+            // source from the grid
+        }
+
+        // Reactivate scouts to find new sources
+        setScoutCount(getScoutCount() + 1);
     }
 
 }
