@@ -20,7 +20,7 @@ public class Environment {
     private double lowQualityThreshold;
     private double mediumQualityThreshold;
     private double highQualityThreshold;
-    private static final double BEST_SOURCE_QUALITY_THRESHOLD = 0.9;
+    private static final double BEST_SOURCE_QUALITY_THRESHOLD = 0.8;
     private static int MAX_ATTEMPTS = 10;
 
     public Environment(int width, int height) {
@@ -78,18 +78,20 @@ public class Environment {
 
         // Perform actions based on bee types
         for (Bee bee : bees) {
-            if (bee instanceof Worker) {
-                ((Worker) bee).exploreAndChooseFoodSource(this);
-            } else if (bee instanceof Scout) {
-                ((Scout) bee).chooseRandomFoodSource(this);
-            } else if (bee instanceof Observer) {
-                ((Observer) bee).observeAndChooseFoodSource(this);
-            }
+            if (bee.getCurrentFoodSource() != null) { // Check if current food source is not null
+                if (bee instanceof Worker) {
+                    ((Worker) bee).exploreAndChooseFoodSource(this);
+                } else if (bee instanceof Scout) {
+                    ((Scout) bee).chooseRandomFoodSource(this);
+                } else if (bee instanceof Observer) {
+                    ((Observer) bee).observeAndChooseFoodSource(this);
+                }
 
-            // Check if the best source is found
-            if (bee.getCurrentFoodSource().getQuality() >= BEST_SOURCE_QUALITY_THRESHOLD) {
-                bestSourceFound = true;
-                break;
+                // Check if the best source is found
+                if (bee.getCurrentFoodSource().getQuality() >= BEST_SOURCE_QUALITY_THRESHOLD) {
+                    bestSourceFound = true;
+                    break;
+                }
             }
         }
 
