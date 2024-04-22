@@ -13,18 +13,22 @@ import simulation.Environment;
 import simulation.FoodSource;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener; // Add this import statement for ChangeListener
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.Map;
+import java.util.HashMap;
 
 public class BeeForagingSimulationGUI extends JFrame {
     private Environment environment;
-    private JLabel[][] gridLabels; // Declare gridLabels as a class member
+    private static JLabel[][] gridLabels; // Declare gridLabels as a class member
 
     private ImageIcon workerIcon;
     private ImageIcon scoutIcon;
     private ImageIcon observerIcon;
-    private ImageIcon foodSourceIcon;
     private ImageIcon flowerIconLowQuality;
     private ImageIcon flowerIconMediumQuality;
     private ImageIcon flowerIconHighQuality;
+    private JTextArea simulationLog; // Added text area for simulation log
 
     private ImageIcon hiveIcon;
 
@@ -32,6 +36,14 @@ public class BeeForagingSimulationGUI extends JFrame {
     private JTextField workerCountField;
     private JTextField scoutCountField;
     private JTextField observerCountField;
+    JSlider trialCountSlider;
+
+    public void appendToSimulationLog(String message) {
+        // Append message to the simulation log text area
+        simulationLog.append(message + "\n");
+        // Scroll to the bottom of the text area
+        simulationLog.setCaretPosition(simulationLog.getDocument().getLength());
+    }
 
     private Random random; // Declare Random for random number generation
 
@@ -52,7 +64,46 @@ public class BeeForagingSimulationGUI extends JFrame {
 
     }
 
-    private void loadIcons() {
+    // public Map<String, ImageIcon> loadIcons() {
+    // // Create a map to store the icons
+    // Map<String, ImageIcon> iconsMap = new HashMap<>();
+
+    // // Load images for bees and add them to the map
+    // iconsMap.put("Worker Bee",
+    // new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker
+    // Bee.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+    // iconsMap.put("Scout Bee", new ImageIcon(new
+    // ImageIcon(getClass().getResource("resources/images/Scout.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+    // iconsMap.put("Observer Bee",
+    // new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Observer
+    // Bee.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+
+    // // Load images for food sources based on quality and add them to the map
+    // iconsMap.put("Flower_low_quality", new ImageIcon(
+    // new
+    // ImageIcon(getClass().getResource("resources/images/Flower_low_quality.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+    // iconsMap.put("Flower_medium_quality", new ImageIcon(
+    // new
+    // ImageIcon(getClass().getResource("resources/images/Flower_medium_quality.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+    // iconsMap.put("Flower_high_quality", new ImageIcon(
+    // new
+    // ImageIcon(getClass().getResource("resources/images/Flower_high_quality.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+
+    // // Load image for hive and add it to the map
+    // iconsMap.put("Hive", new ImageIcon(new
+    // ImageIcon(getClass().getResource("resources/images/Hive.jpg"))
+    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
+
+    // // Return the map containing the loaded icons
+    // return iconsMap;
+    // }
+    public void loadIcons() {
         // Load images for bees
         workerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"))
                 .getImage().getScaledInstance(100, 35, Image.SCALE_FAST));
@@ -91,6 +142,12 @@ public class BeeForagingSimulationGUI extends JFrame {
 
         gridLabels = new JLabel[environment.getWidth()][environment.getHeight()];
 
+        // // Create text area for simulation log
+        // simulationLog = new JTextArea(10, 50);
+        // simulationLog.setEditable(false); // Make it read-only
+        // JScrollPane scrollPane = new JScrollPane(simulationLog);
+        // mainPanel.add(scrollPane, BorderLayout.EAST);
+
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
                 gridLabels[i][j] = new JLabel();
@@ -119,14 +176,6 @@ public class BeeForagingSimulationGUI extends JFrame {
         List<Bee> bees = environment.getBees();
         FoodSource[][] grid = environment.getGrid();
 
-        // Clear previous state
-        for (int i = 0; i < environment.getWidth(); i++) {
-            for (int j = 0; j < environment.getHeight(); j++) {
-                gridLabels[i][j].setIcon(null); // Clear icon
-                gridLabels[i][j].setToolTipText(null); // Clear tooltip
-            }
-        }
-
         // Update grid labels to represent food sources and hive
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
@@ -140,7 +189,8 @@ public class BeeForagingSimulationGUI extends JFrame {
                         if (quality < environment.getLowQualityThreshold()) {
                             gridLabels[i][j].setIcon(flowerIconLowQuality);
                             gridLabels[i][j].setToolTipText("Food Source (Low Quality)");
-                        } else if (quality < environment.getMediumQualityThreshold()) {
+                        } else if (quality < environment.getMediumQualityThreshold() && quality > environment
+                                .getLowQualityThreshold()) {
                             gridLabels[i][j].setIcon(flowerIconMediumQuality);
                             gridLabels[i][j].setToolTipText("Food Source (Medium Quality)");
                         } else {
@@ -148,6 +198,9 @@ public class BeeForagingSimulationGUI extends JFrame {
                             gridLabels[i][j].setToolTipText("Food Source (High Quality)");
                         }
                     }
+                } else {
+                    gridLabels[i][j].setIcon(null); // Clear icon if no food source
+                    gridLabels[i][j].setToolTipText(null); // Clear tooltip
                 }
             }
         }
@@ -181,7 +234,6 @@ public class BeeForagingSimulationGUI extends JFrame {
         int hiveY = environment.getHeight() / 2;
         gridLabels[hiveX][hiveY].setIcon(hiveIcon);
         gridLabels[hiveX][hiveY].setToolTipText("Hive");
-
     }
 
     private void addParameterControls() {
@@ -228,14 +280,13 @@ public class BeeForagingSimulationGUI extends JFrame {
         JLabel label8 = new JLabel("Maximum Trial Count:");
         controlPanel.add(label8, gbc);
         gbc.gridx++;
-        JSlider trialCountSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 100);
+        // Inside addParameterControls(), directly initialize the class-level variable
+        trialCountSlider = new JSlider(JSlider.HORIZONTAL, 1, 100, 100);
         trialCountSlider.setMajorTickSpacing(10);
         trialCountSlider.setMinorTickSpacing(1);
         trialCountSlider.setPaintTicks(true);
         trialCountSlider.setPaintLabels(true);
         controlPanel.add(trialCountSlider, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
 
         // Add listener for slider value change
         trialCountSlider.addChangeListener(new ChangeListener() {
@@ -267,6 +318,11 @@ public class BeeForagingSimulationGUI extends JFrame {
         return workerCountField;
     }
 
+    // Getter method for workerCountField
+    public JSlider getTrialCountSlider() {
+        return trialCountSlider;
+    }
+
     // Getter method for scoutCountField
     public JTextField getScoutCountField() {
         return scoutCountField;
@@ -275,6 +331,47 @@ public class BeeForagingSimulationGUI extends JFrame {
     // Getter method for observerCountField
     public JTextField getObserverCountField() {
         return observerCountField;
+    }
+
+    public void displayBees() {
+        System.out.println("Displaying bees...");
+        List<Bee> bees = environment.getBees();
+        System.out.println(bees);
+        for (Bee bee : bees) {
+            int x = bee.getPositionX();
+            int y = bee.getPositionY();
+            System.out.println(bee);
+
+            System.out.println("Bee position: (" + x + ", " + y + ")");
+
+            ImageIcon beeIcon = null;
+            String beeType = "";
+
+            // Check the actual type of the bee using instanceof
+            if (bee instanceof Worker) {
+                gridLabels[x][y].setIcon(workerIcon); // Set the icon
+                beeIcon = workerIcon;
+                beeType = "Worker Bee";
+            } else if (bee instanceof Scout) {
+                beeIcon = scoutIcon;
+                beeType = "Scout Bee";
+            } else if (bee instanceof Observer) {
+                beeIcon = observerIcon;
+                beeType = "Observer Bee";
+            }
+            System.out
+                    .println(bee.getClass().getSimpleName() + " updateBeePositionOnGrid: (" + beeIcon + ", " + y + ")");
+
+            if (beeIcon != null && x >= 0 && x < environment.getWidth() && y >= 0 && y < environment.getHeight()) {
+                gridLabels[x][y].setIcon(beeIcon); // Set the icon
+                gridLabels[x][y].setToolTipText(beeType); // Set tooltip for bee
+                System.out.println("Bee displayed: " + beeType);
+            } else {
+                System.out.println("Failed to display bee at position (" + x + ", " + y + ")");
+            }
+
+        }
+        System.out.println("Displaying bees completed.");
     }
 
     public static void main(String[] args) {
@@ -288,35 +385,49 @@ public class BeeForagingSimulationGUI extends JFrame {
         gui.getSimulateButton().addActionListener(e -> {
             // Validate and parse input for numeric fields
             try {
+
+                // Clear previous simulation state
+                environment.clearSimulation();
+
                 int workerCount = Integer.parseInt(gui.getWorkerCountField().getText());
                 int scoutCount = Integer.parseInt(gui.getScoutCountField().getText());
                 int observerCount = Integer.parseInt(gui.getObserverCountField().getText());
 
+                environment.setGUI(gui);
+
+                // Add new bees and hive for the simulation
                 for (int i = 0; i < workerCount; i++) {
-                    environment.addBee(new Worker());
+                    environment.addBee("Worker");
                 }
 
                 for (int i = 0; i < scoutCount; i++) {
-                    environment.addBee(new Scout());
+                    environment.addBee("Scout");
                 }
 
                 for (int i = 0; i < observerCount; i++) {
-                    environment.addBee(new Observer());
+                    environment.addBee("Observer");
                 }
+                gui.displayBees();
 
                 environment.addHive();
 
-                // Trigger the simulation
-                environment.simulate();
+                int maxIterations = gui.getTrialCountSlider().getValue();
 
-                // Update the GUI to reflect the new state of the simulation
-                gui.updateGUI();
+                // Use SwingUtilities.invokeLater() to wait for pending GUI events to complete
+                SwingUtilities.invokeLater(() -> {
+                    // Trigger the simulation after displaying bees
+                    environment.simulateUntilFoodDepleted(gridLabels, maxIterations);
+                });
+
             } catch (NumberFormatException ex) {
                 // Handle parsing errors
                 JOptionPane.showMessageDialog(gui, "Please enter valid numeric values for all fields.", "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        // // Update the GUI to reflect the initial state before starting the simulation
+        // gui.updateGUI();
 
         // Display the GUI
         SwingUtilities.invokeLater(() -> {

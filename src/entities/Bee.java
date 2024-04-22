@@ -11,6 +11,7 @@ public class Bee {
     protected int positionY;
     protected String behavior;
     protected FoodSource assignedFoodSource;
+    private FoodSource betterFoodSource; // Track the better food source for the bee
 
     public Bee(int posX, int posY, String type) {
         this.positionX = posX;
@@ -56,6 +57,14 @@ public class Bee {
 
     public String getType() {
         return type;
+    }
+
+    public void setBetterFoodSource(FoodSource source) {
+        betterFoodSource = source;
+    }
+
+    public FoodSource getBetterFoodSource() {
+        return betterFoodSource;
     }
 
     public void setType(String type) {

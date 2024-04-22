@@ -1,10 +1,13 @@
 package simulation;
 
+import javax.swing.ImageIcon;
+
 public class FoodSource {
     private int positionX;
     private int positionY;
     private double quality;
     private boolean isHive; // Flag to indicate if it's a hive or not
+    ImageIcon Found;
 
     private int attemptCounter = 0;
     private static final int MAX_ATTEMPTS = 10; // Set this to your desired threshold
@@ -19,6 +22,10 @@ public class FoodSource {
     public FoodSource(double quality, boolean isHive) {
         this.quality = quality;
         this.isHive = isHive;
+    }
+
+    public FoodSource(ImageIcon icon) {
+        this.Found = icon;
     }
 
     public double getQuality() {
