@@ -54,7 +54,6 @@ public class Environment {
         this.height = height;
 
         this.grid = new FoodSource[width][height];
-        this.Beegrid = new Bee[width][height];
         this.bees = new ArrayList<>();
         this.random = new Random();
 
@@ -166,11 +165,11 @@ public class Environment {
             updateBeePositionOnGrid(bee, gridLabels);
         }
 
-        try {
-            Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // try {
+        // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
 
         // SwingUtilities.invokeLater(() -> {
         // // Trigger the simulation after displaying bees
@@ -357,20 +356,20 @@ public class Environment {
         return false;
     }
 
-    public void performDance(Worker worker, JLabel[][] gridLabels) {
-        // Display the dance icon photo
-        displayDanceIcon(gridLabels);
+    // public void performDance(Worker worker, JLabel[][] gridLabels) {
+    // // Display the dance icon photo
+    // displayDanceIcon(gridLabels);
 
-        // After 30 seconds, hide the dance icon photo and reset the worker's state
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                hideDanceIcon(gridLabels);
-                worker.setReturingToHive(false);
-            }
-        }, 30000); // 30 seconds in milliseconds
-    }
+    // // After 30 seconds, hide the dance icon photo and reset the worker's state
+    // Timer timer = new Timer();
+    // timer.schedule(new TimerTask() {
+    // @Override
+    // public void run() {
+    // hideDanceIcon(gridLabels);
+    // worker.setReturingToHive(false);
+    // }
+    // }, 30000); // 30 seconds in milliseconds
+    // }
 
     private void displayDanceIcon(JLabel[][] gridLabels) {
         // Access the grid from the environment

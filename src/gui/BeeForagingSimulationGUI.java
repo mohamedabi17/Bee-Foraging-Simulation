@@ -38,13 +38,6 @@ public class BeeForagingSimulationGUI extends JFrame {
     private JTextField observerCountField;
     JSlider trialCountSlider;
 
-    public void appendToSimulationLog(String message) {
-        // Append message to the simulation log text area
-        simulationLog.append(message + "\n");
-        // Scroll to the bottom of the text area
-        simulationLog.setCaretPosition(simulationLog.getDocument().getLength());
-    }
-
     private Random random; // Declare Random for random number generation
 
     public BeeForagingSimulationGUI(Environment environment) {
@@ -64,45 +57,6 @@ public class BeeForagingSimulationGUI extends JFrame {
 
     }
 
-    // public Map<String, ImageIcon> loadIcons() {
-    // // Create a map to store the icons
-    // Map<String, ImageIcon> iconsMap = new HashMap<>();
-
-    // // Load images for bees and add them to the map
-    // iconsMap.put("Worker Bee",
-    // new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker
-    // Bee.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-    // iconsMap.put("Scout Bee", new ImageIcon(new
-    // ImageIcon(getClass().getResource("resources/images/Scout.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-    // iconsMap.put("Observer Bee",
-    // new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Observer
-    // Bee.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-
-    // // Load images for food sources based on quality and add them to the map
-    // iconsMap.put("Flower_low_quality", new ImageIcon(
-    // new
-    // ImageIcon(getClass().getResource("resources/images/Flower_low_quality.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-    // iconsMap.put("Flower_medium_quality", new ImageIcon(
-    // new
-    // ImageIcon(getClass().getResource("resources/images/Flower_medium_quality.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-    // iconsMap.put("Flower_high_quality", new ImageIcon(
-    // new
-    // ImageIcon(getClass().getResource("resources/images/Flower_high_quality.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-
-    // // Load image for hive and add it to the map
-    // iconsMap.put("Hive", new ImageIcon(new
-    // ImageIcon(getClass().getResource("resources/images/Hive.jpg"))
-    // .getImage().getScaledInstance(100, 35, Image.SCALE_FAST)));
-
-    // // Return the map containing the loaded icons
-    // return iconsMap;
-    // }
     public void loadIcons() {
         // Load images for bees
         workerIcon = new ImageIcon(new ImageIcon(getClass().getResource("resources/images/Worker Bee.jpg"))
@@ -141,12 +95,6 @@ public class BeeForagingSimulationGUI extends JFrame {
         gridPanel.setBackground(Color.BLACK);
 
         gridLabels = new JLabel[environment.getWidth()][environment.getHeight()];
-
-        // // Create text area for simulation log
-        // simulationLog = new JTextArea(10, 50);
-        // simulationLog.setEditable(false); // Make it read-only
-        // JScrollPane scrollPane = new JScrollPane(simulationLog);
-        // mainPanel.add(scrollPane, BorderLayout.EAST);
 
         for (int i = 0; i < environment.getWidth(); i++) {
             for (int j = 0; j < environment.getHeight(); j++) {
@@ -413,11 +361,12 @@ public class BeeForagingSimulationGUI extends JFrame {
 
                 int maxIterations = gui.getTrialCountSlider().getValue();
 
-                // Use SwingUtilities.invokeLater() to wait for pending GUI events to complete
-                SwingUtilities.invokeLater(() -> {
-                    // Trigger the simulation after displaying bees
-                    environment.simulateUntilFoodDepleted(gridLabels, maxIterations);
-                });
+                // Use SwingUtilities.invokeLater() to wait for pending GUI events to
+                // complete
+                // SwingUtilities.invokeLater(() -> {
+                // // Trigger the simulation after displaying bees
+                // environment.simulateUntilFoodDepleted(gridLabels, maxIterations);
+                // });
 
             } catch (NumberFormatException ex) {
                 // Handle parsing errors
@@ -426,7 +375,8 @@ public class BeeForagingSimulationGUI extends JFrame {
             }
         });
 
-        // // Update the GUI to reflect the initial state before starting the simulation
+        // // // Update the GUI to reflect the initial state before starting the
+        // simulation
         // gui.updateGUI();
 
         // Display the GUI
