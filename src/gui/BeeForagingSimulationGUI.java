@@ -153,30 +153,6 @@ public class BeeForagingSimulationGUI extends JFrame {
             }
         }
 
-        // Place bees on the grid
-        for (Bee bee : bees) {
-            int x = bee.getPositionX();
-            int y = bee.getPositionY();
-            ImageIcon beeIcon = null;
-            String beeType = "";
-
-            if (bee instanceof Worker) {
-                beeIcon = workerIcon;
-                beeType = "Worker Bee";
-            } else if (bee instanceof Scout) {
-                beeIcon = scoutIcon;
-                beeType = "Scout Bee";
-            } else if (bee instanceof Observer) {
-                beeIcon = observerIcon;
-                beeType = "Observer Bee";
-            }
-
-            if (beeIcon != null && x >= 0 && x < environment.getWidth() && y >= 0 && y < environment.getHeight()) {
-                gridLabels[x][y].setIcon(beeIcon);
-                gridLabels[x][y].setToolTipText(beeType); // Set tooltip for bee
-            }
-        }
-
         // Display the hive at the center of the grid
         int hiveX = environment.getWidth() / 2;
         int hiveY = environment.getHeight() / 2;
@@ -309,7 +285,7 @@ public class BeeForagingSimulationGUI extends JFrame {
             }
             System.out
                     .println(bee.getClass().getSimpleName() + " updateBeePositionOnGrid: (" + beeIcon + ", " + y + ")");
-
+            environment.setGridLabels(gridLabels);
             if (beeIcon != null && x >= 0 && x < environment.getWidth() && y >= 0 && y < environment.getHeight()) {
                 gridLabels[x][y].setIcon(beeIcon); // Set the icon
                 gridLabels[x][y].setToolTipText(beeType); // Set tooltip for bee
@@ -320,6 +296,110 @@ public class BeeForagingSimulationGUI extends JFrame {
 
         }
         System.out.println("Displaying bees completed.");
+    }
+
+    // public void updateBeePositionOnGrid(Bee bee) {
+    // int oldX = bee.getPositionX(); // Get the bee's previous X position
+    // int oldY = bee.getPositionY(); // Get the bee's previous Y position
+
+    // // Unset the icon of the previous cell
+    // gridLabels[oldX][oldY].setIcon(null);
+
+    // int newX = random.nextInt(environment.getWidth());
+    // int newY = random.nextInt(environment.getHeight());
+    // bee.move(newX, newY);
+    // System.out.println(bee.getClass().getSimpleName() + " moved to: (" + newX +
+    // ", " + newY + ")");
+
+    // // Set the icon and tooltip text for the new cell
+    // String beeType = bee.toString();
+    // if ("Worker Bee".equals(beeType)) {
+    // gridLabels[newX][newY].setIcon(workerIcon);
+    // gridLabels[newX][newY].setToolTipText("Worker Bee");
+    // } else if ("Scout Bee".equals(beeType)) {
+    // gridLabels[newX][newY].setIcon(scoutIcon);
+    // gridLabels[newX][newY].setToolTipText("Scout Bee");
+    // } else if ("Observer Bee".equals(beeType)) {
+    // gridLabels[newX][newY].setIcon(observerIcon);
+    // gridLabels[newX][newY].setToolTipText("Observer Bee");
+    // }
+
+    // System.out.println(beeType + " moved to: (" + newX + ", " + newY + ")");
+
+    // }
+
+    public void simulateUntilFoodDepleted(int maxIterations) {
+        int iteration = 0;
+
+        while (!environment.isFoodDepleted() && iteration < maxIterations) {
+
+            for (Bee bee : environment.bees) {
+
+                // Update the GUI after each bee moves
+
+                int oldX = bee.getPositionX(); // Get the bee's previous X position
+                int oldY = bee.getPositionY(); // Get the bee's previous Y position
+
+                // Unset the icon of the previous cell
+
+                int x, y;
+                do {
+                    x = random.nextInt(environment.getWidth());
+                    y = random.nextInt(environment.getHeight());
+                } while (x < 0 || x >= environment.getWidth() || y < 0 || y >= environment.getHeight() ||
+                        gridLabels[x][y].getIcon() != null || !environment.isValidPosition(x, y));
+                System.out.println(" passed: (");
+
+                ImageIcon beeIcon = null;
+                // String beeType = "";
+                bee.move(x, y);
+                String beeType = bee.toString();
+
+                // Set the icon and tooltip text for the new cell
+
+                if ("Worker Bee".equals(beeType)) {
+                    gridLabels[x][y].setIcon(workerIcon);
+                    beeIcon = workerIcon;
+                    gridLabels[x][y].setToolTipText("Worker Bee");
+
+                } else if ("Scout Bee".equals(beeType)) {
+                    beeIcon = scoutIcon;
+                    gridLabels[x][y].setIcon(scoutIcon);
+                    gridLabels[x][y].setToolTipText("Scout Bee");
+                } else if ("Observer Bee".equals(beeType)) {
+                    beeIcon = observerIcon;
+                    gridLabels[x][y].setIcon(observerIcon);
+                    gridLabels[x][y].setToolTipText("Observer Bee");
+                }
+
+                gridLabels[oldX][oldY].setIcon(null);
+
+                System.out.println(
+                        bee.getClass().getSimpleName() + " we are in moved to: (" + x + ", " + y + ")");
+
+            }
+
+            SwingUtilities.invokeLater(() -> {
+                // Trigger the simulation after displaying bees
+                environment.simulate(); // Perform one iteration of the simulation
+            });
+
+            iteration++;
+            updateGUI();
+
+            // try {
+            // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
+            // } catch (InterruptedException e) {
+            // e.printStackTrace();
+            // }
+        }
+
+        // Check if the simulation ended due to food depletion or maximum iterations
+        // reached
+        if (environment.isFoodDepleted()) {
+            System.out.println("Food is depleted. Simulation terminated.");
+            environment.displayEndOfSimulation("Food is depleted");
+        }
     }
 
     public static void main(String[] args) {
@@ -359,14 +439,14 @@ public class BeeForagingSimulationGUI extends JFrame {
 
                 environment.addHive();
 
+                System.out.println("Before Simulation Start Let you Know that: (" + environment.getGridLabels() + ")");
+
                 int maxIterations = gui.getTrialCountSlider().getValue();
 
-                // Use SwingUtilities.invokeLater() to wait for pending GUI events to
-                // complete
-                // SwingUtilities.invokeLater(() -> {
-                // // Trigger the simulation after displaying bees
-                // environment.simulateUntilFoodDepleted(gridLabels, maxIterations);
-                // });
+                SwingUtilities.invokeLater(() -> {
+                    // Trigger the simulation after displaying bees
+                    gui.simulateUntilFoodDepleted(maxIterations);
+                });
 
             } catch (NumberFormatException ex) {
                 // Handle parsing errors

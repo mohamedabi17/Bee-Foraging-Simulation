@@ -16,11 +16,13 @@ import javax.swing.JLabel;
 import gui.BeeForagingSimulationGUI;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.JOptionPane;
+import javax.swing.*;
 
 public class Environment {
     private FoodSource[][] grid;
-    private Bee[][] Beegrid;
-    private List<Bee> bees;
+    private JLabel[][] gridLabels;
+    public List<Bee> bees;
     private int width;
     private int height;
     private Random random;
@@ -43,7 +45,7 @@ public class Environment {
     private ImageIcon flowerIconHighQuality;
     private ImageIcon hiveIcon;
 
-    private BeeForagingSimulationGUI gui; // Reference to the GUI
+    private BeeForagingSimulationGUI gui;
 
     public void setGUI(BeeForagingSimulationGUI gui) {
         this.gui = gui;
@@ -61,7 +63,6 @@ public class Environment {
         mediumQualityThreshold = 0.6;
         highQualityThreshold = 0.8;
 
-        // Initialize the environment with food sources and add hive
         initializeFoodSources();
         addHive();
         loadIcons();
@@ -156,14 +157,9 @@ public class Environment {
     // log
     // }
 
-    public void simulate(JLabel[][] gridLabels) {
+    public void simulate() {
         final boolean[] bestSourceFound = { false }; // Declare as final array
         final int[] exhaustedFoodSources = { 0 }; // Declare as final array
-
-        for (Bee bee : bees) {
-
-            updateBeePositionOnGrid(bee, gridLabels);
-        }
 
         // try {
         // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
@@ -172,29 +168,28 @@ public class Environment {
         // }
 
         // SwingUtilities.invokeLater(() -> {
-        // // Trigger the simulation after displaying bees
-        // // Update food source qualities
-        // for (int i = 0; i < width; i++) {
-        // for (int j = 0; j < height; j++) {
-        // if (grid[i][j] != null) {
-        // // Update food source quality based on some criteria
-        // double newQuality = calculateNewQuality(grid[i][j]);
-        // grid[i][j].setQuality(newQuality);
-        // System.out.println("Food source at (" + i + ", " + j + ") quality updated to:
-        // " + newQuality);
+        // Trigger the simulation after displaying bees
+        // Update food source qualities
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (grid[i][j] != null) {
+                    // Update food source quality based on some criteria
+                    double newQuality = calculateNewQuality(grid[i][j]);
+                    grid[i][j].setQuality(newQuality);
+                    System.out.println("Food source at (" + i + ", " + j + ") quality updated to:" + newQuality);
 
-        // // Check if the food source quality is under 0.2
-        // if (newQuality < 0.2) {
-        // exhaustedFoodSources[0]++; // Increment the count of exhausted food sources
-        // if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
-        // exit simulation
-        // System.out.println("All food sources exhausted. Simulation terminated.");
-        // return; // End the simulation
-        // }
-        // }
-        // }
-        // }
-        // }
+                    // Check if the food source quality is under 0.2
+                    if (newQuality < 0.2) {
+                        exhaustedFoodSources[0]++; // Increment the count of exhausted food sources
+                        if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
+                            // exit simulation
+                            System.out.println("All food sources exhausted. Simulation terminated.");
+                            return; // End the simulation
+                        }
+                    }
+                }
+            }
+        }
 
         // try {
         // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
@@ -202,95 +197,83 @@ public class Environment {
         // e.printStackTrace();
         // }
 
-        // // Check if any food source is exhausted
-        // if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
-        // exit simulation
-        // System.out.println("All food sources exhausted. Simulation terminated.");
-        // return; // End the simulation
-        // }
+        // Check if any food source is exhausted
+        if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
+            // exit simulation
+            System.out.println("All food sources exhausted. Simulation terminated.");
+            return; // End the simulation
+        }
 
-        // // Get the coordinates of the hive
-        // int hiveX = width / 2;
-        // int hiveY = height / 2;
+        // Get the coordinates of the hive
+        int hiveX = width / 2;
+        int hiveY = height / 2;
 
-        // // Perform actions based on bee types
-        // for (Bee bee : bees) {
-        // if (bee.getCurrentFoodSource() != null) { // Check if current food source is
-        // not null
-        // if (bee instanceof Worker) {
-        // ((Worker) bee).returnToHive(hiveX, hiveY); // Return to the hive
-        // System.out.println(bee.getClass().getSimpleName() + " returning to hive.");
-        // // Check if the worker bee is returning to the hive and display its behavior
-        // // accordingly
-        // for (Worker worker : this.getWorkers()) {
-        // if (worker.getReturingToHive()) {
-        // // Update the visual representation of the worker bee to indicate it's
-        // returning
-        // // to the hive
-        // // Example: worker.setVisualState("Returning to Hive");
-        // // Example: drawWorkerIconAtHiveLocation();
-        // performDance(worker, gridLabels);
-        // System.out.println(bee.getClass().getSimpleName() + " performing dance at
-        // hive.");
-        // } else {
-        // // Update the visual representation of the worker bee to indicate it's
-        // // performing a dance
-        // // Example: worker.setVisualState("Performing Dance");
-        // // Example: displayDanceIcon();
-        // System.out.println(bee.getClass().getSimpleName() + " performing dance.");
-        // }
-        // }
-        // } else if (bee instanceof Scout) {
-        // ((Scout) bee).chooseRandomFoodSource(this);
-        // System.out.println(bee.getClass().getSimpleName() + " choosing random food
-        // source.");
-        // } else if (bee instanceof Observer) {
-        // ((Observer) bee).observeAndChooseFoodSource(this);
-        // System.out.println(bee.getClass().getSimpleName() + " observing and choosing
-        // food source.");
-        // }
+        // Perform actions based on bee types
+        for (Bee bee : bees) {
+            if (bee.getCurrentFoodSource() != null) { // Check if current food source is
+                // not null
+                if (bee instanceof Worker) {
+                    ((Worker) bee).returnToHive(hiveX, hiveY); // Return to the hive
+                    System.out.println(bee.getClass().getSimpleName() + " returning to hive.");
+                    // Check if the worker bee is returning to the hive and display its behavior
+                    // accordingly
+                    for (Worker worker : this.getWorkers()) {
+                        if (worker.getReturingToHive()) {
 
-        // // Check if the best source is found
-        // if (bee.getCurrentFoodSource().getQuality() >= BEST_SOURCE_QUALITY_THRESHOLD)
-        // {
-        // bestSourceFound[0] = true;
-        // System.out.println("Best source found by " + bee.getClass().getSimpleName() +
-        // ".");
-        // displayEndOfSimulation(gridLabels, "Best source found by");
-        // break;
-        // }
-        // }
-        // }
+                            performDance(worker);
+                            System.out.println(bee.getClass().getSimpleName() + " performing dance at hive.");
+                        } else {
+                            // Update the visual representation of the worker bee to indicate it's
+                            // performing a dance
+                            // Example: worker.setVisualState("Performing Dance");
+                            // Example: displayDanceIcon();
+                            System.out.println(bee.getClass().getSimpleName() + " performing dance.");
+                        }
+                    }
+                } else if (bee instanceof Scout) {
+                    ((Scout) bee).chooseRandomFoodSource(this);
+                    System.out.println(bee.getClass().getSimpleName() + " choosing random food source.");
+                } else if (bee instanceof Observer) {
+                    ((Observer) bee).observeAndChooseFoodSource(this);
+                    System.out.println(bee.getClass().getSimpleName() + " observing and choosing  food source.");
+                }
 
-        // // Display popup dialog with results
-        // if (bestSourceFound[0] || exhaustedFoodSources[0] == 3) {
-        // String resultMessage = bestSourceFound[0] ? "Best source found." : "All food
-        // sources exhausted.";
-        // // appendToSimulationLog(resultMessage);
-        // }
+                // Check if the best source is found
+                if (bee.getCurrentFoodSource().getQuality() >= BEST_SOURCE_QUALITY_THRESHOLD) {
+                    bestSourceFound[0] = true;
+                    System.out.println("Best source found by " + bee.getClass().getSimpleName() +
+                            ".");
+                    displayEndOfSimulation("Best source found by");
+                    break;
+                }
+            }
+        }
+
+        // Display popup dialog with results
+        if (bestSourceFound[0] || exhaustedFoodSources[0] == 3) {
+            String resultMessage = bestSourceFound[0] ? "Best source found." : "All food sources exhausted.";
+            // appendToSimulationLog(resultMessage);
+        }
         // });
     }
 
-    public void simulateUntilFoodDepleted(JLabel[][] gridLabels, int maxIterations) {
-        int iteration = 0;
+    // public void simulateUntilFoodDepleted(int maxIterations) {
+    // int iteration = 0;
 
-        while (!isFoodDepleted() && iteration < maxIterations) {
-            simulate(gridLabels); // Perform one iteration of the simulation
-            iteration++;
-        }
+    // while (!isFoodDepleted() && iteration < maxIterations) {
+    // simulate(); // Perform one iteration of the simulation
+    // iteration++;
+    // }
 
-        // Check if the simulation ended due to food depletion or maximum iterations
-        // reached
-        if (isFoodDepleted()) {
-            System.out.println("Food is depleted. Simulation terminated.");
-            displayEndOfSimulation(gridLabels, "Food is depleted");
-        } else {
-            System.out.println("Maximum iterations reached. Simulation terminated.");
-            displayEndOfSimulation(gridLabels, "Maximum iterations reached");
-        }
-    }
+    // // Check if the simulation ended due to food depletion or maximum iterations
+    // // reached
+    // if (isFoodDepleted()) {
+    // System.out.println("Food is depleted. Simulation terminated.");
+    // displayEndOfSimulation(gridLabels, "Food is depleted");
+    // }
+    // }
 
-    private void updateBeePositionOnGrid(Bee bee, JLabel[][] gridLabels) {
+    public void updateBeePositionOnGrid(Bee bee) {
         int oldX = bee.getPositionX(); // Get the bee's previous X position
         int oldY = bee.getPositionY(); // Get the bee's previous Y position
 
@@ -318,7 +301,15 @@ public class Environment {
         System.out.println(bee.getClass().getSimpleName() + " moved to: (" + newX + ", " + newY + ")");
     }
 
-    private boolean isFoodDepleted() {
+    // private void updateGUI() {
+    // // Update the GUI components asynchronously
+    // SwingUtilities.invokeLater(() -> {
+    // // Update the GUI components here
+    // gui.repaint(); // Repaint the GUI to reflect the changes
+    // });
+    // }
+
+    public boolean isFoodDepleted() {
         // Check if all food sources have quality less than a certain threshold (e.g.,
         // 0.2)
         for (int i = 0; i < width; i++) {
@@ -342,13 +333,15 @@ public class Environment {
         initializeFoodSources();
     }
 
-    private void displayEndOfSimulation(JLabel[][] gridLabels, String message) {
+    public void displayEndOfSimulation(String message) {
         // Get the center coordinates of the grid to display the message
         int centerX = width / 2;
         int centerY = height / 2;
 
         // Update the specified grid label with the end of simulation message
         gridLabels[centerX][centerY].setText(message);
+        JOptionPane.showMessageDialog(null, message, "Simulation Results", JOptionPane.INFORMATION_MESSAGE);
+
     }
 
     private boolean otherTerminationConditionsMet() {
@@ -356,22 +349,22 @@ public class Environment {
         return false;
     }
 
-    // public void performDance(Worker worker, JLabel[][] gridLabels) {
-    // // Display the dance icon photo
-    // displayDanceIcon(gridLabels);
+    public void performDance(Worker worker) {
+        // Display the dance icon photo
+        displayDanceIcon();
 
-    // // After 30 seconds, hide the dance icon photo and reset the worker's state
-    // Timer timer = new Timer();
-    // timer.schedule(new TimerTask() {
-    // @Override
-    // public void run() {
-    // hideDanceIcon(gridLabels);
-    // worker.setReturingToHive(false);
-    // }
-    // }, 30000); // 30 seconds in milliseconds
-    // }
+        // After 30 seconds, hide the dance icon photo and reset the worker's state
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                hideDanceIcon(gridLabels);
+                worker.setReturingToHive(false);
+            }
+        }, 30000); // 30 seconds in milliseconds
+    }
 
-    private void displayDanceIcon(JLabel[][] gridLabels) {
+    private void displayDanceIcon() {
         // Access the grid from the environment
 
         int width = this.getWidth();
@@ -425,8 +418,8 @@ public class Environment {
         return foodSource.getQuality() * 0.9;
     }
 
-    private boolean isValidPosition(int posX, int posY) {
-        return posX >= 0 && posX < width && posY >= 0 && posY < height && grid[posX][posY] == null && Beegrid == null;
+    public boolean isValidPosition(int posX, int posY) {
+        return posX >= 0 && posX < width && posY >= 0 && posY < height && grid[posX][posY] == null;
     }
 
     public Environment getInstance() {
@@ -476,6 +469,14 @@ public class Environment {
 
     public int getHeight() {
         return height;
+    }
+
+    public void setGridLabels(JLabel[][] gridLabels) {
+        this.gridLabels = gridLabels;
+    }
+
+    public JLabel[][] getGridLabels() {
+        return (this.gridLabels);
     }
 
     public List<Bee> getBees() {
