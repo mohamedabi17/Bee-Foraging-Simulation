@@ -152,64 +152,58 @@ public class Environment {
         hive = new Hive(width / 2, height / 2); // Place hive at the center of the environment
     }
 
-    // public void appendToSimulationLog(String message) {
-    // simulationLog.append(message + "\n"); // Append a message to the simulation
-    // log
-    // }
-
-    public void simulate() {
+    public int simulate() {
         final boolean[] bestSourceFound = { false }; // Declare as final array
         final int[] exhaustedFoodSources = { 0 }; // Declare as final array
 
-        // try {
-        // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
+        for (Bee bee : this.bees) {
 
-        // SwingUtilities.invokeLater(() -> {
-        // Trigger the simulation after displaying bees
-        // Update food source qualities
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                if (grid[i][j] != null) {
-                    // Update food source quality based on some criteria
-                    double newQuality = calculateNewQuality(grid[i][j]);
-                    grid[i][j].setQuality(newQuality);
-                    System.out.println("Food source at (" + i + ", " + j + ") quality updated to:" + newQuality);
+            // Update the GUI after each bee moves
 
-                    // Check if the food source quality is under 0.2
-                    if (newQuality < 0.2) {
-                        exhaustedFoodSources[0]++; // Increment the count of exhausted food sources
-                        if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
-                            // exit simulation
-                            System.out.println("All food sources exhausted. Simulation terminated.");
-                            return; // End the simulation
-                        }
-                    }
-                }
+            int oldX = bee.getPositionX(); // Get the bee's previous X position
+            int oldY = bee.getPositionY(); // Get the bee's previous Y position
+
+            // Unset the icon of the previous cell
+
+            int x, y;
+            do {
+                x = random.nextInt(this.getWidth());
+                y = random.nextInt(this.getHeight());
+            } while (x < 0 || x >= this.getWidth() || y < 0 || y >= this.getHeight() ||
+                    gridLabels[x][y].getIcon() != null || !this.isValidPosition(x, y));
+            System.out.println(" passed: (");
+
+            ImageIcon beeIcon = null;
+            // String beeType = "";
+            bee.move(x, y);
+            String beeType = bee.toString();
+
+            // Set the icon and tooltip text for the new cell
+
+            if ("Worker Bee".equals(beeType)) {
+                gridLabels[x][y].setIcon(workerIcon);
+                beeIcon = workerIcon;
+                gridLabels[x][y].setToolTipText("Worker Bee");
+
+            } else if ("Scout Bee".equals(beeType)) {
+                beeIcon = scoutIcon;
+                gridLabels[x][y].setIcon(scoutIcon);
+                gridLabels[x][y].setToolTipText("Scout Bee");
+            } else if ("Observer Bee".equals(beeType)) {
+                beeIcon = observerIcon;
+                gridLabels[x][y].setIcon(observerIcon);
+                gridLabels[x][y].setToolTipText("Observer Bee");
             }
-        }
 
-        // try {
-        // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
-        // } catch (InterruptedException e) {
-        // e.printStackTrace();
-        // }
+            gridLabels[oldX][oldY].setIcon(null);
 
-        // Check if any food source is exhausted
-        if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
-            // exit simulation
-            System.out.println("All food sources exhausted. Simulation terminated.");
-            return; // End the simulation
-        }
+            System.out.println(
+                    bee.getClass().getSimpleName() + " we are in moved to: (" + x + ", " + y + ")");
 
-        // Get the coordinates of the hive
-        int hiveX = width / 2;
-        int hiveY = height / 2;
+            // Get the coordinates of the hive
+            int hiveX = width / 2;
+            int hiveY = height / 2;
 
-        // Perform actions based on bee types
-        for (Bee bee : bees) {
             if (bee.getCurrentFoodSource() != null) { // Check if current food source is
                 // not null
                 if (bee instanceof Worker) {
@@ -244,9 +238,65 @@ public class Environment {
                     System.out.println("Best source found by " + bee.getClass().getSimpleName() +
                             ".");
                     displayEndOfSimulation("Best source found by");
-                    break;
+                    return 1;
+
                 }
             }
+
+        }
+
+        try {
+            Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // SwingUtilities.invokeLater(() -> {
+        // Trigger the simulation after displaying bees
+        // Update food source qualities
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                if (grid[i][j] != null) {
+                    // Update food source quality based on some criteria
+                    double newQuality = calculateNewQuality(grid[i][j]);
+                    // if (newQuality < 0.2) {
+                    // System.out.println("All food sources exhausted. Simulation terminated.");
+                    // displayEndOfSimulation("Quality exhausted .");
+                    // return 1;
+                    // }
+                    grid[i][j].setQuality(newQuality);
+                    System.out.println("Food source at (" + i + ", " + j + ") quality updated to:" + newQuality);
+
+                    // Check if the food source quality is under 0.2
+                    if (newQuality < 0.2) {
+                        exhaustedFoodSources[0]++; // Increment the count of exhausted food sources
+                        if (exhaustedFoodSources[0] == 3) { // If all food sources are exhausted,
+                            // exit simulation
+                            System.out.println("All food sources exhausted. Simulation terminated.3");
+                            displayEndOfSimulation("All food sources exhausted. Simulation terminated.2");
+
+                            return 1; // End the simulation
+                        }
+                    }
+                }
+            }
+        }
+
+        // try {
+        // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
+        // } catch (InterruptedException e) {
+        // e.printStackTrace();
+        // }
+
+        // Check if any food source is exhausted
+        if (exhaustedFoodSources[0] == 3)
+
+        { // If all food sources are exhausted,
+          // exit simulation
+            System.out.println("All food sources exhausted. Simulation terminated.5");
+            displayEndOfSimulation("All food sources exhausted. Simulation terminated.4");
+
+            return 1; // End the simulation
         }
 
         // Display popup dialog with results
@@ -255,6 +305,8 @@ public class Environment {
             // appendToSimulationLog(resultMessage);
         }
         // });
+
+        return 0;
     }
 
     // public void simulateUntilFoodDepleted(int maxIterations) {
@@ -312,14 +364,27 @@ public class Environment {
     public boolean isFoodDepleted() {
         // Check if all food sources have quality less than a certain threshold (e.g.,
         // 0.2)
+
+        int counter = 0;
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 if (grid[i][j] != null && grid[i][j].getQuality() >= 0.2) {
                     return false; // Food source found with quality above threshold
                 }
+                if (grid[i][j] != null && grid[i][j].getQuality() <= 0.2) {
+                    gridLabels[i][j].setIcon(flowerIconLowQuality);
+                    counter++;
+
+                }
             }
         }
-        return true; // No food source with quality above threshold found
+
+        if (counter == 3) {
+            displayEndOfSimulation("food depleated");
+            return true;
+        }
+        return false;
+
     }
 
     public void clearSimulation() {
@@ -342,6 +407,8 @@ public class Environment {
         gridLabels[centerX][centerY].setText(message);
         JOptionPane.showMessageDialog(null, message, "Simulation Results", JOptionPane.INFORMATION_MESSAGE);
 
+        // // Stop the application
+        // System.exit(0);
     }
 
     private boolean otherTerminationConditionsMet() {
