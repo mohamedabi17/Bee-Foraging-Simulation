@@ -17,6 +17,7 @@ public class Bee {
         this.positionX = posX;
         this.positionY = posY;
         this.type = type;
+        this.currentFoodSource = null;
     }
 
     protected FoodSource currentFoodSource;

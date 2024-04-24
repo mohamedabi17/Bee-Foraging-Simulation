@@ -257,6 +257,47 @@ public class BeeForagingSimulationGUI extends JFrame {
         return observerCountField;
     }
 
+    public void updateBeePositionOnGrid(Bee bee) {
+        int oldX = bee.getPositionX(); // Get the bee's previous X position
+        int oldY = bee.getPositionY(); // Get the bee's previous Y position
+
+        // Unset the icon of the previous cell
+
+        int x, y;
+        do {
+            x = random.nextInt(environment.getWidth());
+            y = random.nextInt(environment.getHeight());
+        } while (x < 0 || x >= environment.getWidth() || y < 0 || y >= environment.getHeight() ||
+                gridLabels[x][y].getIcon() != null || !environment.isValidPosition(x, y));
+        System.out.println(" passed: (");
+
+        ImageIcon beeIcon = null;
+        // String beeType = "";
+        bee.move(x, y);
+        String beeType = bee.toString();
+
+        if ("Worker Bee".equals(beeType)) {
+            this.gridLabels[x][y].setIcon(workerIcon);
+            beeIcon = workerIcon;
+            gridLabels[x][y].setToolTipText("Worker Bee");
+
+        } else if ("Scout Bee".equals(beeType)) {
+            beeIcon = scoutIcon;
+            this.gridLabels[x][y].setIcon(scoutIcon);
+            gridLabels[x][y].setToolTipText("Scout Bee");
+        } else if ("Observer Bee".equals(beeType)) {
+            beeIcon = observerIcon;
+            this.gridLabels[x][y].setIcon(observerIcon);
+            gridLabels[x][y].setToolTipText("Observer Bee");
+        }
+
+        this.gridLabels[oldX][oldY].setIcon(null);
+
+        System.out.println(
+                bee.getClass().getSimpleName() + " we are in moved to: (" + x + ", " + y +
+                        ")");
+    }
+
     public void displayBees() {
         System.out.println("Displaying bees...");
         List<Bee> bees = environment.getBees();
@@ -298,36 +339,6 @@ public class BeeForagingSimulationGUI extends JFrame {
         System.out.println("Displaying bees completed.");
     }
 
-    // public void updateBeePositionOnGrid(Bee bee) {
-    // int oldX = bee.getPositionX(); // Get the bee's previous X position
-    // int oldY = bee.getPositionY(); // Get the bee's previous Y position
-
-    // // Unset the icon of the previous cell
-    // gridLabels[oldX][oldY].setIcon(null);
-
-    // int newX = random.nextInt(environment.getWidth());
-    // int newY = random.nextInt(environment.getHeight());
-    // bee.move(newX, newY);
-    // System.out.println(bee.getClass().getSimpleName() + " moved to: (" + newX +
-    // ", " + newY + ")");
-
-    // // Set the icon and tooltip text for the new cell
-    // String beeType = bee.toString();
-    // if ("Worker Bee".equals(beeType)) {
-    // gridLabels[newX][newY].setIcon(workerIcon);
-    // gridLabels[newX][newY].setToolTipText("Worker Bee");
-    // } else if ("Scout Bee".equals(beeType)) {
-    // gridLabels[newX][newY].setIcon(scoutIcon);
-    // gridLabels[newX][newY].setToolTipText("Scout Bee");
-    // } else if ("Observer Bee".equals(beeType)) {
-    // gridLabels[newX][newY].setIcon(observerIcon);
-    // gridLabels[newX][newY].setToolTipText("Observer Bee");
-    // }
-
-    // System.out.println(beeType + " moved to: (" + newX + ", " + newY + ")");
-
-    // }
-
     public void simulateUntilFoodDepleted(int maxIterations) {
         int iteration = 0;
 
@@ -335,8 +346,8 @@ public class BeeForagingSimulationGUI extends JFrame {
             if (environment.simulate() == 1) {
                 break;
             } //
+
             iteration++;
-            // updateGUI();
 
             // try {
             // Thread.sleep(1000); // Introduce a delay of 1 second (adjust as needed)
@@ -352,6 +363,12 @@ public class BeeForagingSimulationGUI extends JFrame {
             environment.displayEndOfSimulation("Food is depleted");
             return;
         }
+    }
+
+    private void updateGUI2() {
+        // Update the GUI components asynchronously
+        // Update the GUI components here
+        this.repaint(); // Repaint the GUI to reflect the changes
     }
 
     public static void main(String[] args) {

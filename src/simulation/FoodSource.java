@@ -10,7 +10,7 @@ public class FoodSource {
     ImageIcon Found;
 
     private int attemptCounter = 0;
-    private static final int MAX_ATTEMPTS = 10; // Set this to your desired threshold
+    private static final int MAX_ATTEMPTS = 3; // Set this to your desired threshold
 
     public FoodSource(int posX, int posY, double quality) {
         this.positionX = posX;
