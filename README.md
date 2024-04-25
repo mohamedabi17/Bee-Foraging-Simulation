@@ -6,9 +6,9 @@ This is a Java application for simulating bee foraging behavior in a given envir
 
 Before running the application, make sure you have the following installed:
 
-1. **OpenJDK 21.0.3**: You can download and install it from [here]([https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-21)).
+1. **OpenJDK 21.0.3**: You can download and install it from [here](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-21).
 
-2. **Cmder**: Download and install Cmder from [here]([https://cmder.app/](https://cmder.app/))](https://cmder.app/)).
+2. **Cmder**: Download and install Cmder from [here](https://cmder.app/).
 
 3. **Visual Studio Code Extensions**: Install the required extensions for Visual Studio Code to run and execute Java code.
 
