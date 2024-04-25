@@ -23,7 +23,7 @@ Before running the application, make sure you have the following installed:
    - Open your command line interface (e.g., Cmder) and navigate to the directory where you want to clone the repository.
    - Run the following command to clone the repository:
      ```
-     git clone <repository_link>
+     git clone [<repository_link>](https://github.com/mohamedabi17/Bee-Foraging-Simulation/)
      ```
 
 3. **Compile Source Code**:
