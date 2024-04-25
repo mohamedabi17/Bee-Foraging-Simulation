@@ -356,6 +356,8 @@ public class BeeForagingSimulationGUI extends JFrame {
             // }
         }
 
+        environment.runABCAlgorithm(maxIterations);
+
         // Check if the simulation ended due to food depletion or maximum iterations
         // reached
         if (environment.isFoodDepleted()) {
@@ -363,12 +365,6 @@ public class BeeForagingSimulationGUI extends JFrame {
             environment.displayEndOfSimulation("Food is depleted");
             return;
         }
-    }
-
-    private void updateGUI2() {
-        // Update the GUI components asynchronously
-        // Update the GUI components here
-        this.repaint(); // Repaint the GUI to reflect the changes
     }
 
     public static void main(String[] args) {

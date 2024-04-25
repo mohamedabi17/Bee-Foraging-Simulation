@@ -4,6 +4,7 @@ import entities.Bee;
 import entities.Observer;
 import entities.Hive;
 import entities.Scout;
+import entities.Tour;
 import entities.Worker;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
@@ -30,7 +31,8 @@ public class Environment {
     private double lowQualityThreshold;
     private double mediumQualityThreshold;
     private double highQualityThreshold;
-    private static final double BEST_SOURCE_QUALITY_THRESHOLD = 0.6;
+    private int numberOfCities = 5; // Define this variable
+    private static final double BEST_SOURCE_QUALITY_THRESHOLD = 0.5;
     private static int MAX_ATTEMPTS = 10;
     private static Environment instance;
     private ImageIcon DANCE_ICON;
@@ -247,17 +249,19 @@ public class Environment {
             // quality is less than the current grid cell quality, assign the current grid
             // cell as the bee's assigned food source
             if (bee.getCurrentFoodSource() == null
-                    || bee.getCurrentFoodSource().getQuality() > grid[x][y].getQuality())
+                    || bee.getCurrentFoodSource().getQuality() > grid[x][y].getQuality()) {
                 bee.setAssignedFoodSource(grid[x][y]);
-            System.out.println(" Food Checked, Counter of Food Incremented By" + bee.getClass().getSimpleName()
-                    + "Quality is better and  new food Assigned");
+                System.out.println(" Food Checked, Counter of Food Incremented By" + bee.getClass().getSimpleName()
+                        + "Quality is better and  new food Assigned");
+
+            }
 
         }
-
         // Check if the bee has a current food source
         if (bee.getCurrentFoodSource() != null) {
             // Perform actions based on the type of bee
             if (bee instanceof Worker) {
+
                 ((Worker) bee).returnToHive(hiveX, hiveY); // Return to the hive
                 System.out.println(bee.getClass().getSimpleName() + " returning to hive.");
 
@@ -266,8 +270,10 @@ public class Environment {
                 for (Worker worker : this.getWorkers()) {
                     if (worker.getReturingToHive()) {
                         performDance(worker);
+                        worker.communicateSourceInformation(grid[x][y]);
                         System.out.println(bee.getClass().getSimpleName() + " performing dance at hive.");
                     }
+                    // worker.exploreNeighborhood(this);
                 }
             } else if (bee instanceof Scout) {
                 // If the scout bee attempted to find food more than 3 times in the same cell,
@@ -277,6 +283,9 @@ public class Environment {
                     grid[x][y] = null;
                     System.out.println(
                             "Food source at position (" + x + ", " + y + ") removed due to multiple attempts.");
+                } else {
+                    ((Scout) bee).exploreSource(this, grid[x][y]);
+                    ((Scout) bee).exploreNeighborhood(this);
                 }
                 System.out.println(bee.getClass().getSimpleName() + " choosing random food source.");
             } else if (bee instanceof Observer) {
@@ -676,6 +685,20 @@ public class Environment {
         }
     }
 
+    public static List<double[]> generateRandomCoordinates(int numberOfCities, int width, int height) {
+        List<double[]> coordinatesList = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < numberOfCities; i++) {
+            double x = random.nextDouble() * width;
+            double y = random.nextDouble() * height;
+            double[] coordinates = { x, y };
+            coordinatesList.add(coordinates);
+        }
+
+        return coordinatesList;
+    }
+
     public double getLowQualityThreshold() {
         return lowQualityThreshold;
     }
@@ -703,6 +726,86 @@ public class Environment {
 
         // Reactivate scouts to find new sources
         setScoutCount(getScoutCount() + 1);
+    }
+
+    public void runABCAlgorithm(int maxIterations) {
+        int iteration = 0;
+        Tour globalBestTour = null;
+        double globalBestDistance = Double.POSITIVE_INFINITY;
+        List<double[]> coordinatesList = generateRandomCoordinates(numberOfCities, width, height);
+
+        while (iteration < maxIterations) {
+            // Employed Bees Phase
+            for (Bee bee : bees) {
+                bee.populateCityCoordinates(coordinatesList); // Provide the coordinates list
+                // Generate random tour for scout
+                Tour tour = bee.generateRandomTour();
+                bee.setTour(tour);
+                // Apply local search (2-opt) to improve tour
+                if (bee.getTour() != null) {
+                    localSearch(bee);
+                }
+            }
+
+            // Onlooker Bees Phase
+            for (Bee bee : bees) {
+                // Onlooker bee selects a tour
+                Tour tour = bee.getTour();
+                // Apply local search (2-opt) to improve tour
+                if (tour != null) {
+                    localSearch(bee);
+                }
+            }
+
+            // Global Update
+            for (Bee bee : bees) {
+                Tour tour = bee.getTour();
+                if (tour != null) {
+                    double distance = bee.calculateTourDistance(tour);
+                    if (distance < globalBestDistance) {
+                        globalBestTour = tour;
+                        globalBestDistance = distance;
+                    }
+                }
+            }
+
+            // Termination condition: You can use a convergence criterion or a maximum
+            // number of iterations
+            iteration++;
+        }
+
+        displayBestTour(globalBestTour);
+
+        // After the algorithm finishes, globalBestTour contains the best tour found
+        // Perform any necessary actions with the best tour (e.g., display it)
+    }
+
+    public void displayBestTour(Tour bestTour) {
+
+        String BestTour = bestTour.toString();
+
+        System.out.println("displayBestTour : " + BestTour);
+        JOptionPane.showMessageDialog(null, bestTour.toString(), "Best Tour:", JOptionPane.INFORMATION_MESSAGE);
+
+        // // Stop the application
+        // System.exit(0);
+    }
+
+    public void localSearch(Bee bee) {
+        Tour tour = bee.getTour();
+        for (int i = 0; i < tour.size() - 1; i++) {
+            for (int j = i + 1; j < tour.size(); j++) {
+                // Apply 2-opt swap: reverse the sub-tour between cities i and j
+                Tour newTour = bee.twoOptSwap(tour, i, j);
+                double newDistance = bee.calculateTourDistance(newTour);
+                double currentDistance = bee.calculateTourDistance(tour);
+                if (newDistance < currentDistance) {
+                    // If the new tour is better, update the current tour
+                    tour = newTour;
+                    bee.setTour(newTour);
+                }
+            }
+        }
     }
 
 }

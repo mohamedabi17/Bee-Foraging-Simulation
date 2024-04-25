@@ -62,4 +62,36 @@ public class Scout extends Bee {
         }
     }
 
+    public void communicateSourceInformation(FoodSource source) {
+        System.out.println("Scout Found New Food Source: " + source);
+    }
+
+    public void replaceFoodSource(FoodSource newFoodSource) {
+        // Simulate Scout replacing food source
+        if (assignedFoodSource != null) {
+            assignedFoodSource = newFoodSource;
+            System.out.println("Scout replaced food source");
+            communicateSourceInformation(newFoodSource);
+        }
+    }
+
+    public void exploreNeighborhood(Environment environment) {
+        // Explore the neighborhood for better sources
+        List<FoodSource> neighboringSources = environment.getNeighboringFoodSources(this);
+        for (FoodSource source : neighboringSources) {
+            replaceSourceIfBetter(this.getCurrentFoodSource(), source);
+        }
+    }
+
+    public void replaceSourceIfBetter(FoodSource currentSource, FoodSource newSource) {
+        // Replace the current source if a better one is found
+        if (currentSource != null && newSource != null) {
+            double currentQuality = currentSource.getQuality();
+            double newQuality = newSource.getQuality();
+            if (newQuality > currentQuality) {
+                this.replaceFoodSource(newSource);
+            }
+        }
+    }
+
 }
