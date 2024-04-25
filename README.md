@@ -6,7 +6,7 @@ This is a Java application for simulating bee foraging behavior in a given envir
 
 Before running the application, make sure you have the following installed:
 
-1. **OpenJDK 21.0.3**: You can download and install it from [here](https://example.com/openjdk-21.0.3).
+1. **OpenJDK 21.0.3**: You can download and install it from [here]([https://example.com/openjdk-21.0.3](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-21)).
 
 2. **Cmder**: Download and install Cmder from [here](https://example.com/cmder).
 
